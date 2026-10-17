@@ -60,6 +60,25 @@
 
 ---
 
+## 4. DPS368 2GO の書き込み準備（Hi6to のPC）
+
+> Kato さんの H02・H05 の結果より：DPS368 2GO のマイコンは XMC4200。挿すと `USB シリアル デバイス` として見える（最初から何かのプログラムが入っている可能性あり）。
+> 現行の Arduino XMC 定義（4.x）は XMC4200 非対応 → **旧版 3.5.7 の「XMC4200 Platform 2GO」を Hi6to のPCに入れ、DPS368 サンプルのコンパイルは成功済み**。書き込みには SEGGER J-Link が要る見込み。
+
+| ID | 状態 | 担当 | タスク | 確認方法・結果 |
+|---|---|---|---|---|
+| H14 | [ ] | Hi6to | SEGGER の公式サイトから **J-Link Software and Documentation Pack（Windows 64bit）** をダウンロードしてインストール（ライセンスへの同意が必要なので本人が行う） | 結果： |
+| H15 | [ ] | Hi6to | DPS368 2GO を Hi6to のPCに挿し、Claude に「DPS368 2GO を確認して」と頼む。Claude が (1) 最初から入っているプログラムの出力を読む (2) J-Link で書き込めるかを確認する | 結果： |
+
+## 5. チームで決めること（ヒアリング）
+
+| ID | 状態 | 担当 | タスク | 確認方法・結果 |
+|---|---|---|---|---|
+| R01 | [ ] | iwakikeitai9-design | **結果画面のヒアリング**：`docs/hearing/result_screen.md` の自分の欄に回答して push | 結果： |
+| R02 | [ ] | KatoRyunosuke-git | 同上（結果画面のヒアリング） | 結果： |
+| R03 | [ ] | oira0822 | 同上（結果画面のヒアリング） | 結果： |
+| R04 | [ ] | Hi6to | 同上（結果画面のヒアリング）。全員分そろったら Claude とまとめて決める | 結果： |
+
 ## ボード情報（H01・H02 で記入）
 
 | ボード | 型番 | USBの形 | 付属品 | 備考 |
@@ -77,3 +96,5 @@
 
 - （コードの修正提案や、困ったことはここに書く）
 - 10/17 KatoRyunosuke：受け取った箱は KIT_DPS368_2GO / CY8CPROTO-041TP / CY8CPROTO-062-4343W / KIT_PSC3M5_EVK の4つ。DPS368 は 2GO Kit で届いている。H02 の結果、マイコンは **XMC4200**。Arduino（infineon:xmc）でこのボードを選べるか、Hi6to のPC側でボード定義を確認してほしい
+  - → 10/17 Claude（Hi6to PC）：現行 4.1.1 は非対応。旧版 3.5.7 に入れ替えて「XMC4200 Platform 2GO」（`infineon:xmc:XMC4200_Platform2GO`）を選べるようにし、DPS368 サンプルのコンパイル成功。DPS368 2GO とピン配置が同じか、書き込めるかは実機で確認する（4章 H14・H15）
+- 10/17 Claude：仕様の決定事項を `docs/SPEC.md` にまとめた。作業前に一度読んでおいてください
