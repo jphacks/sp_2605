@@ -35,7 +35,7 @@
 
 ## アプリの起動（どのPCでも）
 
-**はじめて動かすPCでは [docs/SETUP.md](docs/SETUP.md) を見る**（Claude Code に「docs/SETUP.md を読んで、このPCで動かせるようにして」と頼めば、順に進めてくれる）。
+**はじめて動かすPCでは、手作業なら [docs/SETUP_MANUAL.md](docs/SETUP_MANUAL.md)（ダウンロードとクリックだけ）、Claude Code に任せるなら [docs/SETUP.md](docs/SETUP.md) を見る**（Claude Code に「docs/SETUP.md を読んで、このPCで動かせるようにして」と頼めば、順に進めてくれる）。
 
 ```bash
 py -m pip install -r requirements.txt   # 最初の1回
