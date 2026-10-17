@@ -124,535 +124,7 @@
         <Property id="ISX_R_CONST" value="700"/>
     </IsxProperties>
     <Widgets>
-        <Widget id="ISX_Button1" type="ISX_BUTTON" sub_type="NONE" mode="ISX">
-            <WidgetProperties>
-                <Property id="DIPLEXING" value="false"/>
-                <Property id="MAX_POS_X" value="100"/>
-                <Property id="MAX_POS_Y" value="100"/>
-                <Property id="WGT_MULTI_FREQ_SCAN_EN" value="false"/>
-                <Property id="FINGER_CP" value="0.1"/>
-                <Property id="SNS_CLK" value="16"/>
-                <Property id="ROW_SNS_CLK" value="16"/>
-                <Property id="TX_CLK" value="16"/>
-                <Property id="CLK_SOURCE" value="DIRECT"/>
-                <Property id="LFSR_RANGE" value="AUTO"/>
-                <Property id="LFSR_DITHER_LIMIT" value="10"/>
-                <Property id="CLK_SOURCE_AUTO_SEL_MODE" value="STRONG"/>
-                <Property id="NUM_SUBCONVERSIONS" value="317"/>
-                <Property id="CIC_RATE_MODE" value="AUTO"/>
-                <Property id="CIC_RATE" value="78"/>
-                <Property id="CIC_SHIFT" value="AUTO"/>
-                <Property id="ROW_CIC_SHIFT" value="AUTO"/>
-                <Property id="CDAC_REF0" value="95"/>
-                <Property id="ROW_CDAC_REF0" value="0"/>
-                <Property id="CDAC_FINE0" value="5"/>
-                <Property id="ROW_CDAC_FINE0" value="1"/>
-                <Property id="MAX_RAW_COUNT" value="0"/>
-                <Property id="ROW_MAX_RAW_COUNT" value="0"/>
-                <Property id="CDAC_DITHER_MODE" value="MANUAL"/>
-                <Property id="CDAC_DITHER_VALUE" value="0"/>
-                <Property id="COARSE_INIT_BYPASS_EN" value="false"/>
-                <Property id="COMP_DIV" value="16"/>
-                <Property id="MP_TX_ORDER" value="1"/>
-                <Property id="MP_ROW_ORDER" value="1"/>
-                <Property id="CDAC_REF_MODE" value="AUTO"/>
-                <Property id="CDAC_REF_BOOST" value="DISABLE"/>
-                <Property id="CDAC_FINE_MODE" value="AUTO"/>
-                <Property id="CDAC_COMP_EN_MODE" value="AUTO"/>
-                <Property id="CDAC_COMP_DIV_MODE" value="AUTO"/>
-                <Property id="CDAC_DIRECTION" value="DIRECT"/>
-                <Property id="FINGER_TH" value="56"/>
-                <Property id="PROX_TOUCH_TH" value="100"/>
-                <Property id="NOISE_TH" value="28"/>
-                <Property id="NNOISE_TH" value="28"/>
-                <Property id="LOW_BSLN_RST" value="30"/>
-                <Property id="HYSTERESIS" value="7"/>
-                <Property id="ON_DEBOUNCE" value="3"/>
-                <Property id="VELOCITY" value="2500"/>
-                <Property id="CM_FILTER" value="false"/>
-                <Property id="CMF_TH" value="75"/>
-                <Property id="IIR_FILTER" value="false"/>
-                <Property id="IIR_FILTER_COEFF" value="128"/>
-                <Property id="MEDIAN_FILTER" value="false"/>
-                <Property id="AVG_FILTER" value="false"/>
-                <Property id="JITTER_FILTER" value="false"/>
-                <Property id="AIIR_FILTER" value="false"/>
-                <Property id="AIIR_NO_MOV_TH" value="3"/>
-                <Property id="AIIR_LITTLE_MOV_TH" value="7"/>
-                <Property id="AIIR_LARGE_MOV_TH" value="12"/>
-                <Property id="AIIR_MAXK" value="60"/>
-                <Property id="AIIR_MINK" value="1"/>
-                <Property id="AIIR_DIV_VAL" value="64"/>
-                <Property id="CENTROID_TYPE" value="CSD3X3"/>
-                <Property id="CROSS_COUPLING_POS_TH" value="5"/>
-                <Property id="EDGE_CORRECTION" value="true"/>
-                <Property id="EDGE_VIRTUAL_SENSOR_TH" value="100"/>
-                <Property id="EDGE_PENULTIMATE_TH" value="100"/>
-                <Property id="BALLISTIC_MULT" value="false"/>
-                <Property id="ACCEL_COEFF" value="9"/>
-                <Property id="SPEED_COEFF" value="2"/>
-                <Property id="DIVISOR" value="4"/>
-                <Property id="SPEED_TH_X" value="3"/>
-                <Property id="SPEED_TH_Y" value="4"/>
-                <Property id="GESTURE_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_SINGLE_CLICK_ENABLE" value="true"/>
-                <Property id="GESTURE_1F_DOUBLE_CLICK_ENABLE" value="true"/>
-                <Property id="GESTURE_1F_TRIPLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_LONG_PRESS_ENABLE" value="true"/>
-                <Property id="GESTURE_2F_LONG_PRESS_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_CLICK_DRAG_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_SINGLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_DOUBLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_SCROLL_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_SCROLL_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_EDGE_SWIPE_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_EDGE_SWIPE_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_FLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_FLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_ROTATE_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_ZOOM_ENABLE" value="false"/>
-                <Property id="GESTURE_FILTERING_ENABLE" value="false"/>
-                <Property id="CLICK_TIMEOUT_MAX" value="1000"/>
-                <Property id="CLICK_TIMEOUT_MIN" value="0"/>
-                <Property id="CLICK_DISTANCE_MAX" value="100"/>
-                <Property id="SECOND_CLICK_INTERVAL_MAX" value="1000"/>
-                <Property id="SECOND_CLICK_INTERVAL_MIN" value="0"/>
-                <Property id="SECOND_CLICK_DISTANCE_MAX" value="100"/>
-                <Property id="LONG_PRESS_TIMEOUT_MIN" value="1000"/>
-                <Property id="LONG_PRESS_DISTANCE_MAX" value="100"/>
-                <Property id="SCROLL_DEBOUNCE" value="3"/>
-                <Property id="SCROLL_DISTANCE_MIN" value="20"/>
-                <Property id="ROTATE_DEBOUNCE" value="10"/>
-                <Property id="ROTATE_DISTANCE_MIN" value="50"/>
-                <Property id="ZOOM_DEBOUNCE" value="3"/>
-                <Property id="ZOOM_DISTANCE_MIN" value="50"/>
-                <Property id="FLICK_TIMEOUT_MAX" value="300"/>
-                <Property id="FLICK_DISTANCE_MIN" value="100"/>
-                <Property id="EDGE_EDGE_SIZE" value="200"/>
-                <Property id="EDGE_DISTANCE_MIN" value="200"/>
-                <Property id="EDGE_TIMEOUT_MAX" value="2000"/>
-                <Property id="EDGE_ANGLE_MAX" value="45"/>
-            </WidgetProperties>
-            <Electrodes>
-                <Electrode id="Rx0" kind="Column">
-                    <ElectrodeProperties>
-                        <Property id="CDAC0" value="0"/>
-                        <Property id="CDAC1" value="32"/>
-                        <Property id="CDAC2" value="32"/>
-                        <Property id="PINS" value="Dedicated pin"/>
-                    </ElectrodeProperties>
-                </Electrode>
-                <Electrode id="Lx0" kind="Row">
-                    <ElectrodeProperties>
-                        <Property id="PINS" value="Dedicated pin"/>
-                    </ElectrodeProperties>
-                </Electrode>
-            </Electrodes>
-            <Sensors>
-                <Sensor id="Rx0_Lx0" rx="0" tx="0">
-                    <SensorProperties>
-                        <Property id="DIFF" value="0"/>
-                    </SensorProperties>
-                </Sensor>
-            </Sensors>
-        </Widget>
-        <Widget id="ISX_Button2" type="ISX_BUTTON" sub_type="NONE" mode="ISX">
-            <WidgetProperties>
-                <Property id="DIPLEXING" value="false"/>
-                <Property id="MAX_POS_X" value="100"/>
-                <Property id="MAX_POS_Y" value="100"/>
-                <Property id="WGT_MULTI_FREQ_SCAN_EN" value="false"/>
-                <Property id="FINGER_CP" value="0.1"/>
-                <Property id="SNS_CLK" value="16"/>
-                <Property id="ROW_SNS_CLK" value="16"/>
-                <Property id="TX_CLK" value="16"/>
-                <Property id="CLK_SOURCE" value="DIRECT"/>
-                <Property id="LFSR_RANGE" value="AUTO"/>
-                <Property id="LFSR_DITHER_LIMIT" value="10"/>
-                <Property id="CLK_SOURCE_AUTO_SEL_MODE" value="STRONG"/>
-                <Property id="NUM_SUBCONVERSIONS" value="325"/>
-                <Property id="CIC_RATE_MODE" value="AUTO"/>
-                <Property id="CIC_RATE" value="80"/>
-                <Property id="CIC_SHIFT" value="AUTO"/>
-                <Property id="ROW_CIC_SHIFT" value="AUTO"/>
-                <Property id="CDAC_REF0" value="101"/>
-                <Property id="ROW_CDAC_REF0" value="0"/>
-                <Property id="CDAC_FINE0" value="1"/>
-                <Property id="ROW_CDAC_FINE0" value="1"/>
-                <Property id="MAX_RAW_COUNT" value="0"/>
-                <Property id="ROW_MAX_RAW_COUNT" value="0"/>
-                <Property id="CDAC_DITHER_MODE" value="MANUAL"/>
-                <Property id="CDAC_DITHER_VALUE" value="0"/>
-                <Property id="COARSE_INIT_BYPASS_EN" value="false"/>
-                <Property id="COMP_DIV" value="16"/>
-                <Property id="MP_TX_ORDER" value="1"/>
-                <Property id="MP_ROW_ORDER" value="1"/>
-                <Property id="CDAC_REF_MODE" value="AUTO"/>
-                <Property id="CDAC_REF_BOOST" value="DISABLE"/>
-                <Property id="CDAC_FINE_MODE" value="AUTO"/>
-                <Property id="CDAC_COMP_EN_MODE" value="AUTO"/>
-                <Property id="CDAC_COMP_DIV_MODE" value="AUTO"/>
-                <Property id="CDAC_DIRECTION" value="DIRECT"/>
-                <Property id="FINGER_TH" value="56"/>
-                <Property id="PROX_TOUCH_TH" value="100"/>
-                <Property id="NOISE_TH" value="28"/>
-                <Property id="NNOISE_TH" value="28"/>
-                <Property id="LOW_BSLN_RST" value="30"/>
-                <Property id="HYSTERESIS" value="7"/>
-                <Property id="ON_DEBOUNCE" value="3"/>
-                <Property id="VELOCITY" value="2500"/>
-                <Property id="CM_FILTER" value="false"/>
-                <Property id="CMF_TH" value="75"/>
-                <Property id="IIR_FILTER" value="false"/>
-                <Property id="IIR_FILTER_COEFF" value="128"/>
-                <Property id="MEDIAN_FILTER" value="false"/>
-                <Property id="AVG_FILTER" value="false"/>
-                <Property id="JITTER_FILTER" value="false"/>
-                <Property id="AIIR_FILTER" value="false"/>
-                <Property id="AIIR_NO_MOV_TH" value="3"/>
-                <Property id="AIIR_LITTLE_MOV_TH" value="7"/>
-                <Property id="AIIR_LARGE_MOV_TH" value="12"/>
-                <Property id="AIIR_MAXK" value="60"/>
-                <Property id="AIIR_MINK" value="1"/>
-                <Property id="AIIR_DIV_VAL" value="64"/>
-                <Property id="CENTROID_TYPE" value="CSD3X3"/>
-                <Property id="CROSS_COUPLING_POS_TH" value="5"/>
-                <Property id="EDGE_CORRECTION" value="true"/>
-                <Property id="EDGE_VIRTUAL_SENSOR_TH" value="100"/>
-                <Property id="EDGE_PENULTIMATE_TH" value="100"/>
-                <Property id="BALLISTIC_MULT" value="false"/>
-                <Property id="ACCEL_COEFF" value="9"/>
-                <Property id="SPEED_COEFF" value="2"/>
-                <Property id="DIVISOR" value="4"/>
-                <Property id="SPEED_TH_X" value="3"/>
-                <Property id="SPEED_TH_Y" value="4"/>
-                <Property id="GESTURE_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_SINGLE_CLICK_ENABLE" value="true"/>
-                <Property id="GESTURE_1F_DOUBLE_CLICK_ENABLE" value="true"/>
-                <Property id="GESTURE_1F_TRIPLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_LONG_PRESS_ENABLE" value="true"/>
-                <Property id="GESTURE_2F_LONG_PRESS_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_CLICK_DRAG_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_SINGLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_DOUBLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_SCROLL_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_SCROLL_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_EDGE_SWIPE_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_EDGE_SWIPE_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_FLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_FLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_ROTATE_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_ZOOM_ENABLE" value="false"/>
-                <Property id="GESTURE_FILTERING_ENABLE" value="false"/>
-                <Property id="CLICK_TIMEOUT_MAX" value="1000"/>
-                <Property id="CLICK_TIMEOUT_MIN" value="0"/>
-                <Property id="CLICK_DISTANCE_MAX" value="100"/>
-                <Property id="SECOND_CLICK_INTERVAL_MAX" value="1000"/>
-                <Property id="SECOND_CLICK_INTERVAL_MIN" value="0"/>
-                <Property id="SECOND_CLICK_DISTANCE_MAX" value="100"/>
-                <Property id="LONG_PRESS_TIMEOUT_MIN" value="1000"/>
-                <Property id="LONG_PRESS_DISTANCE_MAX" value="100"/>
-                <Property id="SCROLL_DEBOUNCE" value="3"/>
-                <Property id="SCROLL_DISTANCE_MIN" value="20"/>
-                <Property id="ROTATE_DEBOUNCE" value="10"/>
-                <Property id="ROTATE_DISTANCE_MIN" value="50"/>
-                <Property id="ZOOM_DEBOUNCE" value="3"/>
-                <Property id="ZOOM_DISTANCE_MIN" value="50"/>
-                <Property id="FLICK_TIMEOUT_MAX" value="300"/>
-                <Property id="FLICK_DISTANCE_MIN" value="100"/>
-                <Property id="EDGE_EDGE_SIZE" value="200"/>
-                <Property id="EDGE_DISTANCE_MIN" value="200"/>
-                <Property id="EDGE_TIMEOUT_MAX" value="2000"/>
-                <Property id="EDGE_ANGLE_MAX" value="45"/>
-            </WidgetProperties>
-            <Electrodes>
-                <Electrode id="Rx0" kind="Column">
-                    <ElectrodeProperties>
-                        <Property id="CDAC0" value="0"/>
-                        <Property id="CDAC1" value="32"/>
-                        <Property id="CDAC2" value="32"/>
-                        <Property id="PINS" value="Dedicated pin"/>
-                    </ElectrodeProperties>
-                </Electrode>
-                <Electrode id="Lx0" kind="Row">
-                    <ElectrodeProperties>
-                        <Property id="PINS" value="Dedicated pin"/>
-                    </ElectrodeProperties>
-                </Electrode>
-            </Electrodes>
-            <Sensors>
-                <Sensor id="Rx0_Lx0" rx="0" tx="0">
-                    <SensorProperties>
-                        <Property id="DIFF" value="0"/>
-                    </SensorProperties>
-                </Sensor>
-            </Sensors>
-        </Widget>
-        <Widget id="ISX_Button3" type="ISX_BUTTON" sub_type="NONE" mode="ISX">
-            <WidgetProperties>
-                <Property id="DIPLEXING" value="false"/>
-                <Property id="MAX_POS_X" value="100"/>
-                <Property id="MAX_POS_Y" value="100"/>
-                <Property id="WGT_MULTI_FREQ_SCAN_EN" value="false"/>
-                <Property id="FINGER_CP" value="0.1"/>
-                <Property id="SNS_CLK" value="16"/>
-                <Property id="ROW_SNS_CLK" value="16"/>
-                <Property id="TX_CLK" value="16"/>
-                <Property id="CLK_SOURCE" value="DIRECT"/>
-                <Property id="LFSR_RANGE" value="AUTO"/>
-                <Property id="LFSR_DITHER_LIMIT" value="10"/>
-                <Property id="CLK_SOURCE_AUTO_SEL_MODE" value="STRONG"/>
-                <Property id="NUM_SUBCONVERSIONS" value="317"/>
-                <Property id="CIC_RATE_MODE" value="AUTO"/>
-                <Property id="CIC_RATE" value="78"/>
-                <Property id="CIC_SHIFT" value="AUTO"/>
-                <Property id="ROW_CIC_SHIFT" value="AUTO"/>
-                <Property id="CDAC_REF0" value="97"/>
-                <Property id="ROW_CDAC_REF0" value="0"/>
-                <Property id="CDAC_FINE0" value="0"/>
-                <Property id="ROW_CDAC_FINE0" value="1"/>
-                <Property id="MAX_RAW_COUNT" value="0"/>
-                <Property id="ROW_MAX_RAW_COUNT" value="0"/>
-                <Property id="CDAC_DITHER_MODE" value="MANUAL"/>
-                <Property id="CDAC_DITHER_VALUE" value="0"/>
-                <Property id="COARSE_INIT_BYPASS_EN" value="false"/>
-                <Property id="COMP_DIV" value="16"/>
-                <Property id="MP_TX_ORDER" value="1"/>
-                <Property id="MP_ROW_ORDER" value="1"/>
-                <Property id="CDAC_REF_MODE" value="AUTO"/>
-                <Property id="CDAC_REF_BOOST" value="DISABLE"/>
-                <Property id="CDAC_FINE_MODE" value="AUTO"/>
-                <Property id="CDAC_COMP_EN_MODE" value="AUTO"/>
-                <Property id="CDAC_COMP_DIV_MODE" value="AUTO"/>
-                <Property id="CDAC_DIRECTION" value="DIRECT"/>
-                <Property id="FINGER_TH" value="57"/>
-                <Property id="PROX_TOUCH_TH" value="100"/>
-                <Property id="NOISE_TH" value="28"/>
-                <Property id="NNOISE_TH" value="28"/>
-                <Property id="LOW_BSLN_RST" value="30"/>
-                <Property id="HYSTERESIS" value="7"/>
-                <Property id="ON_DEBOUNCE" value="3"/>
-                <Property id="VELOCITY" value="2500"/>
-                <Property id="CM_FILTER" value="false"/>
-                <Property id="CMF_TH" value="75"/>
-                <Property id="IIR_FILTER" value="false"/>
-                <Property id="IIR_FILTER_COEFF" value="128"/>
-                <Property id="MEDIAN_FILTER" value="false"/>
-                <Property id="AVG_FILTER" value="false"/>
-                <Property id="JITTER_FILTER" value="false"/>
-                <Property id="AIIR_FILTER" value="false"/>
-                <Property id="AIIR_NO_MOV_TH" value="3"/>
-                <Property id="AIIR_LITTLE_MOV_TH" value="7"/>
-                <Property id="AIIR_LARGE_MOV_TH" value="12"/>
-                <Property id="AIIR_MAXK" value="60"/>
-                <Property id="AIIR_MINK" value="1"/>
-                <Property id="AIIR_DIV_VAL" value="64"/>
-                <Property id="CENTROID_TYPE" value="CSD3X3"/>
-                <Property id="CROSS_COUPLING_POS_TH" value="5"/>
-                <Property id="EDGE_CORRECTION" value="true"/>
-                <Property id="EDGE_VIRTUAL_SENSOR_TH" value="100"/>
-                <Property id="EDGE_PENULTIMATE_TH" value="100"/>
-                <Property id="BALLISTIC_MULT" value="false"/>
-                <Property id="ACCEL_COEFF" value="9"/>
-                <Property id="SPEED_COEFF" value="2"/>
-                <Property id="DIVISOR" value="4"/>
-                <Property id="SPEED_TH_X" value="3"/>
-                <Property id="SPEED_TH_Y" value="4"/>
-                <Property id="GESTURE_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_SINGLE_CLICK_ENABLE" value="true"/>
-                <Property id="GESTURE_1F_DOUBLE_CLICK_ENABLE" value="true"/>
-                <Property id="GESTURE_1F_TRIPLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_LONG_PRESS_ENABLE" value="true"/>
-                <Property id="GESTURE_2F_LONG_PRESS_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_CLICK_DRAG_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_SINGLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_DOUBLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_SCROLL_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_SCROLL_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_EDGE_SWIPE_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_EDGE_SWIPE_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_FLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_FLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_ROTATE_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_ZOOM_ENABLE" value="false"/>
-                <Property id="GESTURE_FILTERING_ENABLE" value="false"/>
-                <Property id="CLICK_TIMEOUT_MAX" value="1000"/>
-                <Property id="CLICK_TIMEOUT_MIN" value="0"/>
-                <Property id="CLICK_DISTANCE_MAX" value="100"/>
-                <Property id="SECOND_CLICK_INTERVAL_MAX" value="1000"/>
-                <Property id="SECOND_CLICK_INTERVAL_MIN" value="0"/>
-                <Property id="SECOND_CLICK_DISTANCE_MAX" value="100"/>
-                <Property id="LONG_PRESS_TIMEOUT_MIN" value="1000"/>
-                <Property id="LONG_PRESS_DISTANCE_MAX" value="100"/>
-                <Property id="SCROLL_DEBOUNCE" value="3"/>
-                <Property id="SCROLL_DISTANCE_MIN" value="20"/>
-                <Property id="ROTATE_DEBOUNCE" value="10"/>
-                <Property id="ROTATE_DISTANCE_MIN" value="50"/>
-                <Property id="ZOOM_DEBOUNCE" value="3"/>
-                <Property id="ZOOM_DISTANCE_MIN" value="50"/>
-                <Property id="FLICK_TIMEOUT_MAX" value="300"/>
-                <Property id="FLICK_DISTANCE_MIN" value="100"/>
-                <Property id="EDGE_EDGE_SIZE" value="200"/>
-                <Property id="EDGE_DISTANCE_MIN" value="200"/>
-                <Property id="EDGE_TIMEOUT_MAX" value="2000"/>
-                <Property id="EDGE_ANGLE_MAX" value="45"/>
-            </WidgetProperties>
-            <Electrodes>
-                <Electrode id="Rx0" kind="Column">
-                    <ElectrodeProperties>
-                        <Property id="CDAC0" value="0"/>
-                        <Property id="CDAC1" value="32"/>
-                        <Property id="CDAC2" value="32"/>
-                        <Property id="PINS" value="Dedicated pin"/>
-                    </ElectrodeProperties>
-                </Electrode>
-                <Electrode id="Lx0" kind="Row">
-                    <ElectrodeProperties>
-                        <Property id="PINS" value="Dedicated pin"/>
-                    </ElectrodeProperties>
-                </Electrode>
-            </Electrodes>
-            <Sensors>
-                <Sensor id="Rx0_Lx0" rx="0" tx="0">
-                    <SensorProperties>
-                        <Property id="DIFF" value="0"/>
-                    </SensorProperties>
-                </Sensor>
-            </Sensors>
-        </Widget>
-        <Widget id="ISX_Button4" type="ISX_BUTTON" sub_type="NONE" mode="ISX">
-            <WidgetProperties>
-                <Property id="DIPLEXING" value="false"/>
-                <Property id="MAX_POS_X" value="100"/>
-                <Property id="MAX_POS_Y" value="100"/>
-                <Property id="WGT_MULTI_FREQ_SCAN_EN" value="false"/>
-                <Property id="FINGER_CP" value="0.1"/>
-                <Property id="SNS_CLK" value="16"/>
-                <Property id="ROW_SNS_CLK" value="16"/>
-                <Property id="TX_CLK" value="16"/>
-                <Property id="CLK_SOURCE" value="DIRECT"/>
-                <Property id="LFSR_RANGE" value="AUTO"/>
-                <Property id="LFSR_DITHER_LIMIT" value="10"/>
-                <Property id="CLK_SOURCE_AUTO_SEL_MODE" value="STRONG"/>
-                <Property id="NUM_SUBCONVERSIONS" value="321"/>
-                <Property id="CIC_RATE_MODE" value="AUTO"/>
-                <Property id="CIC_RATE" value="79"/>
-                <Property id="CIC_SHIFT" value="AUTO"/>
-                <Property id="ROW_CIC_SHIFT" value="AUTO"/>
-                <Property id="CDAC_REF0" value="96"/>
-                <Property id="ROW_CDAC_REF0" value="0"/>
-                <Property id="CDAC_FINE0" value="2"/>
-                <Property id="ROW_CDAC_FINE0" value="1"/>
-                <Property id="MAX_RAW_COUNT" value="0"/>
-                <Property id="ROW_MAX_RAW_COUNT" value="0"/>
-                <Property id="CDAC_DITHER_MODE" value="MANUAL"/>
-                <Property id="CDAC_DITHER_VALUE" value="0"/>
-                <Property id="COARSE_INIT_BYPASS_EN" value="false"/>
-                <Property id="COMP_DIV" value="16"/>
-                <Property id="MP_TX_ORDER" value="1"/>
-                <Property id="MP_ROW_ORDER" value="1"/>
-                <Property id="CDAC_REF_MODE" value="AUTO"/>
-                <Property id="CDAC_REF_BOOST" value="DISABLE"/>
-                <Property id="CDAC_FINE_MODE" value="AUTO"/>
-                <Property id="CDAC_COMP_EN_MODE" value="AUTO"/>
-                <Property id="CDAC_COMP_DIV_MODE" value="AUTO"/>
-                <Property id="CDAC_DIRECTION" value="DIRECT"/>
-                <Property id="FINGER_TH" value="57"/>
-                <Property id="PROX_TOUCH_TH" value="100"/>
-                <Property id="NOISE_TH" value="28"/>
-                <Property id="NNOISE_TH" value="28"/>
-                <Property id="LOW_BSLN_RST" value="30"/>
-                <Property id="HYSTERESIS" value="7"/>
-                <Property id="ON_DEBOUNCE" value="3"/>
-                <Property id="VELOCITY" value="2500"/>
-                <Property id="CM_FILTER" value="false"/>
-                <Property id="CMF_TH" value="75"/>
-                <Property id="IIR_FILTER" value="false"/>
-                <Property id="IIR_FILTER_COEFF" value="128"/>
-                <Property id="MEDIAN_FILTER" value="false"/>
-                <Property id="AVG_FILTER" value="false"/>
-                <Property id="JITTER_FILTER" value="false"/>
-                <Property id="AIIR_FILTER" value="false"/>
-                <Property id="AIIR_NO_MOV_TH" value="3"/>
-                <Property id="AIIR_LITTLE_MOV_TH" value="7"/>
-                <Property id="AIIR_LARGE_MOV_TH" value="12"/>
-                <Property id="AIIR_MAXK" value="60"/>
-                <Property id="AIIR_MINK" value="1"/>
-                <Property id="AIIR_DIV_VAL" value="64"/>
-                <Property id="CENTROID_TYPE" value="CSD3X3"/>
-                <Property id="CROSS_COUPLING_POS_TH" value="5"/>
-                <Property id="EDGE_CORRECTION" value="true"/>
-                <Property id="EDGE_VIRTUAL_SENSOR_TH" value="100"/>
-                <Property id="EDGE_PENULTIMATE_TH" value="100"/>
-                <Property id="BALLISTIC_MULT" value="false"/>
-                <Property id="ACCEL_COEFF" value="9"/>
-                <Property id="SPEED_COEFF" value="2"/>
-                <Property id="DIVISOR" value="4"/>
-                <Property id="SPEED_TH_X" value="3"/>
-                <Property id="SPEED_TH_Y" value="4"/>
-                <Property id="GESTURE_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_SINGLE_CLICK_ENABLE" value="true"/>
-                <Property id="GESTURE_1F_DOUBLE_CLICK_ENABLE" value="true"/>
-                <Property id="GESTURE_1F_TRIPLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_LONG_PRESS_ENABLE" value="true"/>
-                <Property id="GESTURE_2F_LONG_PRESS_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_CLICK_DRAG_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_SINGLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_DOUBLE_CLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_SCROLL_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_SCROLL_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_EDGE_SWIPE_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_EDGE_SWIPE_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_FLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_FLICK_ENABLE" value="false"/>
-                <Property id="GESTURE_1F_ROTATE_ENABLE" value="false"/>
-                <Property id="GESTURE_2F_ZOOM_ENABLE" value="false"/>
-                <Property id="GESTURE_FILTERING_ENABLE" value="false"/>
-                <Property id="CLICK_TIMEOUT_MAX" value="1000"/>
-                <Property id="CLICK_TIMEOUT_MIN" value="0"/>
-                <Property id="CLICK_DISTANCE_MAX" value="100"/>
-                <Property id="SECOND_CLICK_INTERVAL_MAX" value="1000"/>
-                <Property id="SECOND_CLICK_INTERVAL_MIN" value="0"/>
-                <Property id="SECOND_CLICK_DISTANCE_MAX" value="100"/>
-                <Property id="LONG_PRESS_TIMEOUT_MIN" value="1000"/>
-                <Property id="LONG_PRESS_DISTANCE_MAX" value="100"/>
-                <Property id="SCROLL_DEBOUNCE" value="3"/>
-                <Property id="SCROLL_DISTANCE_MIN" value="20"/>
-                <Property id="ROTATE_DEBOUNCE" value="10"/>
-                <Property id="ROTATE_DISTANCE_MIN" value="50"/>
-                <Property id="ZOOM_DEBOUNCE" value="3"/>
-                <Property id="ZOOM_DISTANCE_MIN" value="50"/>
-                <Property id="FLICK_TIMEOUT_MAX" value="300"/>
-                <Property id="FLICK_DISTANCE_MIN" value="100"/>
-                <Property id="EDGE_EDGE_SIZE" value="200"/>
-                <Property id="EDGE_DISTANCE_MIN" value="200"/>
-                <Property id="EDGE_TIMEOUT_MAX" value="2000"/>
-                <Property id="EDGE_ANGLE_MAX" value="45"/>
-            </WidgetProperties>
-            <Electrodes>
-                <Electrode id="Rx0" kind="Column">
-                    <ElectrodeProperties>
-                        <Property id="CDAC0" value="0"/>
-                        <Property id="CDAC1" value="32"/>
-                        <Property id="CDAC2" value="32"/>
-                        <Property id="PINS" value="Dedicated pin"/>
-                    </ElectrodeProperties>
-                </Electrode>
-                <Electrode id="Lx0" kind="Row">
-                    <ElectrodeProperties>
-                        <Property id="PINS" value="Dedicated pin"/>
-                    </ElectrodeProperties>
-                </Electrode>
-            </Electrodes>
-            <Sensors>
-                <Sensor id="Rx0_Lx0" rx="0" tx="0">
-                    <SensorProperties>
-                        <Property id="DIFF" value="0"/>
-                    </SensorProperties>
-                </Sensor>
-            </Sensors>
-        </Widget>
-        <Widget id="CSD_Button" type="CSD_BUTTON" sub_type="NONE" mode="CSD">
+        <Widget id="Hole1" type="CSD_BUTTON" sub_type="NONE" mode="CSD">
             <WidgetProperties>
                 <Property id="DIPLEXING" value="false"/>
                 <Property id="MAX_POS_X" value="100"/>
@@ -779,7 +251,7 @@
                 </Sensor>
             </Sensors>
         </Widget>
-        <Widget id="CSX_Button" type="CSX_BUTTON" sub_type="NONE" mode="CSX">
+        <Widget id="Hole2" type="CSD_BUTTON" sub_type="NONE" mode="CSD">
             <WidgetProperties>
                 <Property id="DIPLEXING" value="false"/>
                 <Property id="MAX_POS_X" value="100"/>
@@ -787,41 +259,41 @@
                 <Property id="WGT_MULTI_FREQ_SCAN_EN" value="false"/>
                 <Property id="FINGER_CP" value="0.16"/>
                 <Property id="SNS_CLK" value="16"/>
-                <Property id="ROW_SNS_CLK" value="8"/>
-                <Property id="TX_CLK" value="8"/>
+                <Property id="ROW_SNS_CLK" value="16"/>
+                <Property id="TX_CLK" value="16"/>
                 <Property id="CLK_SOURCE" value="DIRECT"/>
                 <Property id="LFSR_RANGE" value="AUTO"/>
                 <Property id="LFSR_DITHER_LIMIT" value="10"/>
                 <Property id="CLK_SOURCE_AUTO_SEL_MODE" value="STRONG"/>
-                <Property id="NUM_SUBCONVERSIONS" value="40"/>
+                <Property id="NUM_SUBCONVERSIONS" value="8"/>
                 <Property id="CIC_RATE_MODE" value="AUTO"/>
-                <Property id="CIC_RATE" value="106"/>
+                <Property id="CIC_RATE" value="42"/>
                 <Property id="CIC_SHIFT" value="AUTO"/>
                 <Property id="ROW_CIC_SHIFT" value="AUTO"/>
-                <Property id="CDAC_REF0" value="50"/>
+                <Property id="CDAC_REF0" value="28"/>
                 <Property id="ROW_CDAC_REF0" value="0"/>
-                <Property id="CDAC_FINE0" value="1"/>
+                <Property id="CDAC_FINE0" value="3"/>
                 <Property id="ROW_CDAC_FINE0" value="1"/>
                 <Property id="MAX_RAW_COUNT" value="0"/>
                 <Property id="ROW_MAX_RAW_COUNT" value="0"/>
                 <Property id="CDAC_DITHER_MODE" value="AUTO"/>
-                <Property id="CDAC_DITHER_VALUE" value="3"/>
+                <Property id="CDAC_DITHER_VALUE" value="2"/>
                 <Property id="COARSE_INIT_BYPASS_EN" value="false"/>
-                <Property id="COMP_DIV" value="8"/>
+                <Property id="COMP_DIV" value="16"/>
                 <Property id="MP_TX_ORDER" value="1"/>
                 <Property id="MP_ROW_ORDER" value="1"/>
-                <Property id="CDAC_REF_MODE" value="AUTO"/>
+                <Property id="CDAC_REF_MODE" value="MANUAL"/>
                 <Property id="CDAC_REF_BOOST" value="DISABLE"/>
-                <Property id="CDAC_FINE_MODE" value="AUTO"/>
+                <Property id="CDAC_FINE_MODE" value="MANUAL"/>
                 <Property id="CDAC_COMP_EN_MODE" value="AUTO"/>
                 <Property id="CDAC_COMP_DIV_MODE" value="AUTO"/>
                 <Property id="CDAC_DIRECTION" value="DIRECT"/>
-                <Property id="FINGER_TH" value="160"/>
+                <Property id="FINGER_TH" value="75"/>
                 <Property id="PROX_TOUCH_TH" value="100"/>
-                <Property id="NOISE_TH" value="80"/>
-                <Property id="NNOISE_TH" value="80"/>
+                <Property id="NOISE_TH" value="36"/>
+                <Property id="NNOISE_TH" value="36"/>
                 <Property id="LOW_BSLN_RST" value="30"/>
-                <Property id="HYSTERESIS" value="16"/>
+                <Property id="HYSTERESIS" value="9"/>
                 <Property id="ON_DEBOUNCE" value="3"/>
                 <Property id="VELOCITY" value="2500"/>
                 <Property id="CM_FILTER" value="false"/>
@@ -889,7 +361,7 @@
                 <Property id="EDGE_ANGLE_MAX" value="45"/>
             </WidgetProperties>
             <Electrodes>
-                <Electrode id="Rx0" kind="Column">
+                <Electrode id="Sns0" kind="Sensor">
                     <ElectrodeProperties>
                         <Property id="CDAC0" value="0"/>
                         <Property id="CDAC1" value="32"/>
@@ -897,14 +369,263 @@
                         <Property id="PINS" value="Dedicated pin"/>
                     </ElectrodeProperties>
                 </Electrode>
-                <Electrode id="Tx" kind="Row">
+            </Electrodes>
+            <Sensors>
+                <Sensor id="Sns0" rx="0" tx="0">
+                    <SensorProperties>
+                        <Property id="DIFF" value="0"/>
+                    </SensorProperties>
+                </Sensor>
+            </Sensors>
+        </Widget>
+        <Widget id="Hole3" type="CSD_BUTTON" sub_type="NONE" mode="CSD">
+            <WidgetProperties>
+                <Property id="DIPLEXING" value="false"/>
+                <Property id="MAX_POS_X" value="100"/>
+                <Property id="MAX_POS_Y" value="100"/>
+                <Property id="WGT_MULTI_FREQ_SCAN_EN" value="false"/>
+                <Property id="FINGER_CP" value="0.16"/>
+                <Property id="SNS_CLK" value="16"/>
+                <Property id="ROW_SNS_CLK" value="16"/>
+                <Property id="TX_CLK" value="16"/>
+                <Property id="CLK_SOURCE" value="DIRECT"/>
+                <Property id="LFSR_RANGE" value="AUTO"/>
+                <Property id="LFSR_DITHER_LIMIT" value="10"/>
+                <Property id="CLK_SOURCE_AUTO_SEL_MODE" value="STRONG"/>
+                <Property id="NUM_SUBCONVERSIONS" value="8"/>
+                <Property id="CIC_RATE_MODE" value="AUTO"/>
+                <Property id="CIC_RATE" value="42"/>
+                <Property id="CIC_SHIFT" value="AUTO"/>
+                <Property id="ROW_CIC_SHIFT" value="AUTO"/>
+                <Property id="CDAC_REF0" value="28"/>
+                <Property id="ROW_CDAC_REF0" value="0"/>
+                <Property id="CDAC_FINE0" value="3"/>
+                <Property id="ROW_CDAC_FINE0" value="1"/>
+                <Property id="MAX_RAW_COUNT" value="0"/>
+                <Property id="ROW_MAX_RAW_COUNT" value="0"/>
+                <Property id="CDAC_DITHER_MODE" value="AUTO"/>
+                <Property id="CDAC_DITHER_VALUE" value="2"/>
+                <Property id="COARSE_INIT_BYPASS_EN" value="false"/>
+                <Property id="COMP_DIV" value="16"/>
+                <Property id="MP_TX_ORDER" value="1"/>
+                <Property id="MP_ROW_ORDER" value="1"/>
+                <Property id="CDAC_REF_MODE" value="MANUAL"/>
+                <Property id="CDAC_REF_BOOST" value="DISABLE"/>
+                <Property id="CDAC_FINE_MODE" value="MANUAL"/>
+                <Property id="CDAC_COMP_EN_MODE" value="AUTO"/>
+                <Property id="CDAC_COMP_DIV_MODE" value="AUTO"/>
+                <Property id="CDAC_DIRECTION" value="DIRECT"/>
+                <Property id="FINGER_TH" value="75"/>
+                <Property id="PROX_TOUCH_TH" value="100"/>
+                <Property id="NOISE_TH" value="36"/>
+                <Property id="NNOISE_TH" value="36"/>
+                <Property id="LOW_BSLN_RST" value="30"/>
+                <Property id="HYSTERESIS" value="9"/>
+                <Property id="ON_DEBOUNCE" value="3"/>
+                <Property id="VELOCITY" value="2500"/>
+                <Property id="CM_FILTER" value="false"/>
+                <Property id="CMF_TH" value="75"/>
+                <Property id="IIR_FILTER" value="false"/>
+                <Property id="IIR_FILTER_COEFF" value="128"/>
+                <Property id="MEDIAN_FILTER" value="false"/>
+                <Property id="AVG_FILTER" value="false"/>
+                <Property id="JITTER_FILTER" value="false"/>
+                <Property id="AIIR_FILTER" value="false"/>
+                <Property id="AIIR_NO_MOV_TH" value="3"/>
+                <Property id="AIIR_LITTLE_MOV_TH" value="7"/>
+                <Property id="AIIR_LARGE_MOV_TH" value="12"/>
+                <Property id="AIIR_MAXK" value="60"/>
+                <Property id="AIIR_MINK" value="1"/>
+                <Property id="AIIR_DIV_VAL" value="64"/>
+                <Property id="CENTROID_TYPE" value="CSD3X3"/>
+                <Property id="CROSS_COUPLING_POS_TH" value="5"/>
+                <Property id="EDGE_CORRECTION" value="true"/>
+                <Property id="EDGE_VIRTUAL_SENSOR_TH" value="100"/>
+                <Property id="EDGE_PENULTIMATE_TH" value="100"/>
+                <Property id="BALLISTIC_MULT" value="false"/>
+                <Property id="ACCEL_COEFF" value="9"/>
+                <Property id="SPEED_COEFF" value="2"/>
+                <Property id="DIVISOR" value="4"/>
+                <Property id="SPEED_TH_X" value="3"/>
+                <Property id="SPEED_TH_Y" value="4"/>
+                <Property id="GESTURE_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_SINGLE_CLICK_ENABLE" value="true"/>
+                <Property id="GESTURE_1F_DOUBLE_CLICK_ENABLE" value="true"/>
+                <Property id="GESTURE_1F_TRIPLE_CLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_LONG_PRESS_ENABLE" value="true"/>
+                <Property id="GESTURE_2F_LONG_PRESS_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_CLICK_DRAG_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_SINGLE_CLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_DOUBLE_CLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_SCROLL_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_SCROLL_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_EDGE_SWIPE_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_EDGE_SWIPE_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_FLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_FLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_ROTATE_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_ZOOM_ENABLE" value="false"/>
+                <Property id="GESTURE_FILTERING_ENABLE" value="false"/>
+                <Property id="CLICK_TIMEOUT_MAX" value="1000"/>
+                <Property id="CLICK_TIMEOUT_MIN" value="0"/>
+                <Property id="CLICK_DISTANCE_MAX" value="100"/>
+                <Property id="SECOND_CLICK_INTERVAL_MAX" value="1000"/>
+                <Property id="SECOND_CLICK_INTERVAL_MIN" value="0"/>
+                <Property id="SECOND_CLICK_DISTANCE_MAX" value="100"/>
+                <Property id="LONG_PRESS_TIMEOUT_MIN" value="1000"/>
+                <Property id="LONG_PRESS_DISTANCE_MAX" value="100"/>
+                <Property id="SCROLL_DEBOUNCE" value="3"/>
+                <Property id="SCROLL_DISTANCE_MIN" value="20"/>
+                <Property id="ROTATE_DEBOUNCE" value="10"/>
+                <Property id="ROTATE_DISTANCE_MIN" value="50"/>
+                <Property id="ZOOM_DEBOUNCE" value="3"/>
+                <Property id="ZOOM_DISTANCE_MIN" value="50"/>
+                <Property id="FLICK_TIMEOUT_MAX" value="300"/>
+                <Property id="FLICK_DISTANCE_MIN" value="100"/>
+                <Property id="EDGE_EDGE_SIZE" value="200"/>
+                <Property id="EDGE_DISTANCE_MIN" value="200"/>
+                <Property id="EDGE_TIMEOUT_MAX" value="2000"/>
+                <Property id="EDGE_ANGLE_MAX" value="45"/>
+            </WidgetProperties>
+            <Electrodes>
+                <Electrode id="Sns0" kind="Sensor">
                     <ElectrodeProperties>
+                        <Property id="CDAC0" value="0"/>
+                        <Property id="CDAC1" value="32"/>
+                        <Property id="CDAC2" value="32"/>
                         <Property id="PINS" value="Dedicated pin"/>
                     </ElectrodeProperties>
                 </Electrode>
             </Electrodes>
             <Sensors>
-                <Sensor id="Rx0" rx="0" tx="0">
+                <Sensor id="Sns0" rx="0" tx="0">
+                    <SensorProperties>
+                        <Property id="DIFF" value="0"/>
+                    </SensorProperties>
+                </Sensor>
+            </Sensors>
+        </Widget>
+        <Widget id="Hole4" type="CSD_BUTTON" sub_type="NONE" mode="CSD">
+            <WidgetProperties>
+                <Property id="DIPLEXING" value="false"/>
+                <Property id="MAX_POS_X" value="100"/>
+                <Property id="MAX_POS_Y" value="100"/>
+                <Property id="WGT_MULTI_FREQ_SCAN_EN" value="false"/>
+                <Property id="FINGER_CP" value="0.16"/>
+                <Property id="SNS_CLK" value="16"/>
+                <Property id="ROW_SNS_CLK" value="16"/>
+                <Property id="TX_CLK" value="16"/>
+                <Property id="CLK_SOURCE" value="DIRECT"/>
+                <Property id="LFSR_RANGE" value="AUTO"/>
+                <Property id="LFSR_DITHER_LIMIT" value="10"/>
+                <Property id="CLK_SOURCE_AUTO_SEL_MODE" value="STRONG"/>
+                <Property id="NUM_SUBCONVERSIONS" value="8"/>
+                <Property id="CIC_RATE_MODE" value="AUTO"/>
+                <Property id="CIC_RATE" value="42"/>
+                <Property id="CIC_SHIFT" value="AUTO"/>
+                <Property id="ROW_CIC_SHIFT" value="AUTO"/>
+                <Property id="CDAC_REF0" value="28"/>
+                <Property id="ROW_CDAC_REF0" value="0"/>
+                <Property id="CDAC_FINE0" value="3"/>
+                <Property id="ROW_CDAC_FINE0" value="1"/>
+                <Property id="MAX_RAW_COUNT" value="0"/>
+                <Property id="ROW_MAX_RAW_COUNT" value="0"/>
+                <Property id="CDAC_DITHER_MODE" value="AUTO"/>
+                <Property id="CDAC_DITHER_VALUE" value="2"/>
+                <Property id="COARSE_INIT_BYPASS_EN" value="false"/>
+                <Property id="COMP_DIV" value="16"/>
+                <Property id="MP_TX_ORDER" value="1"/>
+                <Property id="MP_ROW_ORDER" value="1"/>
+                <Property id="CDAC_REF_MODE" value="MANUAL"/>
+                <Property id="CDAC_REF_BOOST" value="DISABLE"/>
+                <Property id="CDAC_FINE_MODE" value="MANUAL"/>
+                <Property id="CDAC_COMP_EN_MODE" value="AUTO"/>
+                <Property id="CDAC_COMP_DIV_MODE" value="AUTO"/>
+                <Property id="CDAC_DIRECTION" value="DIRECT"/>
+                <Property id="FINGER_TH" value="75"/>
+                <Property id="PROX_TOUCH_TH" value="100"/>
+                <Property id="NOISE_TH" value="36"/>
+                <Property id="NNOISE_TH" value="36"/>
+                <Property id="LOW_BSLN_RST" value="30"/>
+                <Property id="HYSTERESIS" value="9"/>
+                <Property id="ON_DEBOUNCE" value="3"/>
+                <Property id="VELOCITY" value="2500"/>
+                <Property id="CM_FILTER" value="false"/>
+                <Property id="CMF_TH" value="75"/>
+                <Property id="IIR_FILTER" value="false"/>
+                <Property id="IIR_FILTER_COEFF" value="128"/>
+                <Property id="MEDIAN_FILTER" value="false"/>
+                <Property id="AVG_FILTER" value="false"/>
+                <Property id="JITTER_FILTER" value="false"/>
+                <Property id="AIIR_FILTER" value="false"/>
+                <Property id="AIIR_NO_MOV_TH" value="3"/>
+                <Property id="AIIR_LITTLE_MOV_TH" value="7"/>
+                <Property id="AIIR_LARGE_MOV_TH" value="12"/>
+                <Property id="AIIR_MAXK" value="60"/>
+                <Property id="AIIR_MINK" value="1"/>
+                <Property id="AIIR_DIV_VAL" value="64"/>
+                <Property id="CENTROID_TYPE" value="CSD3X3"/>
+                <Property id="CROSS_COUPLING_POS_TH" value="5"/>
+                <Property id="EDGE_CORRECTION" value="true"/>
+                <Property id="EDGE_VIRTUAL_SENSOR_TH" value="100"/>
+                <Property id="EDGE_PENULTIMATE_TH" value="100"/>
+                <Property id="BALLISTIC_MULT" value="false"/>
+                <Property id="ACCEL_COEFF" value="9"/>
+                <Property id="SPEED_COEFF" value="2"/>
+                <Property id="DIVISOR" value="4"/>
+                <Property id="SPEED_TH_X" value="3"/>
+                <Property id="SPEED_TH_Y" value="4"/>
+                <Property id="GESTURE_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_SINGLE_CLICK_ENABLE" value="true"/>
+                <Property id="GESTURE_1F_DOUBLE_CLICK_ENABLE" value="true"/>
+                <Property id="GESTURE_1F_TRIPLE_CLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_LONG_PRESS_ENABLE" value="true"/>
+                <Property id="GESTURE_2F_LONG_PRESS_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_CLICK_DRAG_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_SINGLE_CLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_DOUBLE_CLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_SCROLL_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_SCROLL_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_EDGE_SWIPE_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_EDGE_SWIPE_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_FLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_FLICK_ENABLE" value="false"/>
+                <Property id="GESTURE_1F_ROTATE_ENABLE" value="false"/>
+                <Property id="GESTURE_2F_ZOOM_ENABLE" value="false"/>
+                <Property id="GESTURE_FILTERING_ENABLE" value="false"/>
+                <Property id="CLICK_TIMEOUT_MAX" value="1000"/>
+                <Property id="CLICK_TIMEOUT_MIN" value="0"/>
+                <Property id="CLICK_DISTANCE_MAX" value="100"/>
+                <Property id="SECOND_CLICK_INTERVAL_MAX" value="1000"/>
+                <Property id="SECOND_CLICK_INTERVAL_MIN" value="0"/>
+                <Property id="SECOND_CLICK_DISTANCE_MAX" value="100"/>
+                <Property id="LONG_PRESS_TIMEOUT_MIN" value="1000"/>
+                <Property id="LONG_PRESS_DISTANCE_MAX" value="100"/>
+                <Property id="SCROLL_DEBOUNCE" value="3"/>
+                <Property id="SCROLL_DISTANCE_MIN" value="20"/>
+                <Property id="ROTATE_DEBOUNCE" value="10"/>
+                <Property id="ROTATE_DISTANCE_MIN" value="50"/>
+                <Property id="ZOOM_DEBOUNCE" value="3"/>
+                <Property id="ZOOM_DISTANCE_MIN" value="50"/>
+                <Property id="FLICK_TIMEOUT_MAX" value="300"/>
+                <Property id="FLICK_DISTANCE_MIN" value="100"/>
+                <Property id="EDGE_EDGE_SIZE" value="200"/>
+                <Property id="EDGE_DISTANCE_MIN" value="200"/>
+                <Property id="EDGE_TIMEOUT_MAX" value="2000"/>
+                <Property id="EDGE_ANGLE_MAX" value="45"/>
+            </WidgetProperties>
+            <Electrodes>
+                <Electrode id="Sns0" kind="Sensor">
+                    <ElectrodeProperties>
+                        <Property id="CDAC0" value="0"/>
+                        <Property id="CDAC1" value="32"/>
+                        <Property id="CDAC2" value="32"/>
+                        <Property id="PINS" value="Dedicated pin"/>
+                    </ElectrodeProperties>
+                </Electrode>
+            </Electrodes>
+            <Sensors>
+                <Sensor id="Sns0" rx="0" tx="0">
                     <SensorProperties>
                         <Property id="DIFF" value="0"/>
                     </SensorProperties>
@@ -913,11 +634,9 @@
         </Widget>
     </Widgets>
     <ScanOrder>
-        <Sensor name="ISX_Button1_Rx0_Lx0" slot="0"/>
-        <Sensor name="ISX_Button2_Rx0_Lx0" slot="1"/>
-        <Sensor name="ISX_Button3_Rx0_Lx0" slot="2"/>
-        <Sensor name="ISX_Button4_Rx0_Lx0" slot="3"/>
-        <Sensor name="CSD_Button_Sns0" slot="4"/>
-        <Sensor name="CSX_Button_Rx0" slot="5"/>
+        <Sensor name="Hole1_Sns0" slot="0"/>
+        <Sensor name="Hole2_Sns0" slot="1"/>
+        <Sensor name="Hole3_Sns0" slot="2"/>
+        <Sensor name="Hole4_Sns0" slot="3"/>
     </ScanOrder>
 </Configuration>

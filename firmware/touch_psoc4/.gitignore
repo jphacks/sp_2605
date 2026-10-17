@@ -14,12 +14,12 @@ libs/
 # assetlocks.json
 
 # ModusToolbox Configurator generated code and lock file
-GeneratedSource/
+# GeneratedSource/ も同じ理由で管理する
 *.lock
 .mtbqueryapi
 
 # ModusToolbox BSP files. Any custom BSP file for code examples is shipped within the 'templates' folder
-bsps/
+# bsps/ は指穴4つ用に設定を変えたので管理する
 
 # ModusToolbox build system output
 build/
@@ -148,3 +148,5 @@ ehthumbs.db
 ehthumbs_vista.db
 [Dd]esktop.ini
 .ninja_log
+.hardware-config-server.generated-files
+*.timestamp

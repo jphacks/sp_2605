@@ -517,19 +517,12 @@
                         <Param id="CapacitorCount" value="2"/>
                         <Param id="CapacitorName0" value="Cmod1"/>
                         <Param id="CapacitorName1" value="Cmod2"/>
-                        <Param id="SensorCount" value="12"/>
+                        <Param id="SensorCount" value="5"/>
                         <Param id="SensorName0" value="Shield0"/>
-                        <Param id="SensorName1" value="ISX_Button1_Rx0"/>
-                        <Param id="SensorName10" value="CSX_Button_Rx0"/>
-                        <Param id="SensorName11" value="CSX_Button_Tx"/>
-                        <Param id="SensorName2" value="ISX_Button1_Lx0"/>
-                        <Param id="SensorName3" value="ISX_Button2_Rx0"/>
-                        <Param id="SensorName4" value="ISX_Button2_Lx0"/>
-                        <Param id="SensorName5" value="ISX_Button3_Rx0"/>
-                        <Param id="SensorName6" value="ISX_Button3_Lx0"/>
-                        <Param id="SensorName7" value="ISX_Button4_Rx0"/>
-                        <Param id="SensorName8" value="ISX_Button4_Lx0"/>
-                        <Param id="SensorName9" value="CSD_Button_Sns0"/>
+                        <Param id="SensorName1" value="Hole1_Sns0"/>
+                        <Param id="SensorName2" value="Hole2_Sns0"/>
+                        <Param id="SensorName3" value="Hole3_Sns0"/>
+                        <Param id="SensorName4" value="Hole4_Sns0"/>
                         <Param id="extFrmStartEn" value="false"/>
                         <Param id="mscInstanceName" value="MSCLP0"/>
                     </Parameters>
@@ -664,37 +657,16 @@
                         <Port name="ioss[0].port[4].pin[3].analog[0]"/>
                     </Arm>
                     <Arm>
-                        <Port name="ioss[0].port[3].pin[1].analog[0]"/>
-                    </Arm>
-                    <Arm>
-                        <Port name="ioss[0].port[2].pin[6].analog[0]"/>
-                    </Arm>
-                    <Arm>
-                        <Port name="ioss[0].port[2].pin[5].analog[0]"/>
-                    </Arm>
-                    <Arm>
-                        <Port name="ioss[0].port[2].pin[4].analog[0]"/>
-                    </Arm>
-                    <Arm>
-                        <Port name="ioss[0].port[2].pin[1].analog[0]"/>
+                        <Port name="ioss[0].port[4].pin[5].analog[0]"/>
                     </Arm>
                     <Arm>
                         <Port name="ioss[0].port[2].pin[0].analog[0]"/>
                     </Arm>
                     <Arm>
-                        <Port name="ioss[0].port[2].pin[3].analog[0]"/>
+                        <Port name="ioss[0].port[2].pin[1].analog[0]"/>
                     </Arm>
                     <Arm>
                         <Port name="ioss[0].port[2].pin[2].analog[0]"/>
-                    </Arm>
-                    <Arm>
-                        <Port name="ioss[0].port[4].pin[5].analog[0]"/>
-                    </Arm>
-                    <Arm>
-                        <Port name="ioss[0].port[4].pin[4].analog[0]"/>
-                    </Arm>
-                    <Arm>
-                        <Port name="ioss[0].port[4].pin[6].analog[0]"/>
                     </Arm>
                 </Mux>
             </Netlist>

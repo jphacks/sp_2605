@@ -23,7 +23,8 @@
  * User configurable Macros
  ********************************************************************************/
 /* エア・オカリナ：指穴4つの状態を KitProg3 の USB-UART（115200bps）へ「T:0101」の形で送る。
- * 指穴1 = CSD ボタン、指穴2 = CSX ボタン、指穴3・4 = 外付け電極（予定。今は常に 0）。
+ * 指穴1 = P4.5（基板のボタンと共用）、指穴2 = P2.0、指穴3 = P2.1、指穴4 = P2.2。
+ * どれも CSD（自己容量）ボタン。外付けのアルミ電極を電線でつなぐ。電極をつないでから基板を起動すること（起動時に自動調整するため）。
  * 状態が変わった時と、変わらなくても約0.2秒ごとに送る（PC側がつなぎ直しても状態がわかるように）。 */
 #define UART_CLK_DIV_NUM                (2u)   /* 16bit 分周器 0・1 は CAPSENSE 側が使用中 */
 #define UART_CLK_DIV_VALUE              (51u)  /* 48MHz / 52 / oversample 8 ≒ 115200bps */
@@ -117,16 +118,8 @@ int main(void)
 
     for (;;)
     {
-        /*Scan all slots corresponding to the ISX buttons*/
-        Cy_CapSense_ScanSlots(0u,4u,&cy_capsense_context);
-        while(Cy_CapSense_IsBusy(&cy_capsense_context)){}
-
-        /*Scan the slots corresponding to the CSD button*/
-        Cy_CapSense_ScanSlots(4u,1u,&cy_capsense_context);
-        while(Cy_CapSense_IsBusy(&cy_capsense_context)){}
-
-        /*Scan the slots corresponding to the CSX button*/
-        Cy_CapSense_ScanSlots(5u,1u,&cy_capsense_context);
+        /* 指穴1〜4（CSD ボタン4つ）をまとめてスキャン */
+        Cy_CapSense_ScanAllSlots(&cy_capsense_context);
         while(Cy_CapSense_IsBusy(&cy_capsense_context)){}
 
         /* Process all the widgets */
@@ -170,19 +163,19 @@ static void initialize_uart(void)
  *******************************************************************************/
 static void report_touch(void)
 {
-    /* 基板上で使えるのは CSD・CSX の2ボタンだけ（ISX はコイルが無いと誤反応するので使わない）。
-     * 指穴3・4は外付け電極に切り替えるまで常に 0 を送る。 */
-    static const uint32_t widgets[2] =
+    static const uint32_t widgets[4] =
     {
-        CY_CAPSENSE_CSD_BUTTON_WDGT_ID,
-        CY_CAPSENSE_CSX_BUTTON_WDGT_ID,
+        CY_CAPSENSE_HOLE1_WDGT_ID,
+        CY_CAPSENSE_HOLE2_WDGT_ID,
+        CY_CAPSENSE_HOLE3_WDGT_ID,
+        CY_CAPSENSE_HOLE4_WDGT_ID,
     };
-    static char last[2] = { 'x', 'x' };
+    static char last[4] = { 'x', 'x', 'x', 'x' };
     static uint32_t count = 0u;
     char line[] = "T:0000\r\n";
     bool changed = false;
 
-    for (uint32_t i = 0u; i < 2u; i++)
+    for (uint32_t i = 0u; i < 4u; i++)
     {
         /* Cy_CapSense_IsWidgetActive は触れている時に 0 以外を返す */
         char c = (0u != Cy_CapSense_IsWidgetActive(widgets[i], &cy_capsense_context)) ? '1' : '0';
@@ -317,7 +310,8 @@ static void ezi2c_isr(void)
 void led_control()
 {
 
-    if (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(CY_CAPSENSE_CSD_BUTTON_WDGT_ID, &cy_capsense_context))
+    /* 基板の LED2・LED1 で指穴1・2の状態を表示（元のサンプルと同じ書き方） */
+    if (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(CY_CAPSENSE_HOLE1_WDGT_ID, &cy_capsense_context))
     {
         Cy_GPIO_Write(CYBSP_USER_LED2_PORT, CYBSP_USER_LED2_NUM, CYBSP_LED_ON);
     }
@@ -326,8 +320,7 @@ void led_control()
         Cy_GPIO_Write(CYBSP_USER_LED2_PORT, CYBSP_USER_LED2_NUM, CYBSP_LED_OFF);
     }
 
-
-    if (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(CY_CAPSENSE_CSX_BUTTON_WDGT_ID, &cy_capsense_context))
+    if (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(CY_CAPSENSE_HOLE2_WDGT_ID, &cy_capsense_context))
     {
         Cy_GPIO_Write(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM, CYBSP_LED_ON);
     }
@@ -335,44 +328,6 @@ void led_control()
     {
         Cy_GPIO_Write(CYBSP_USER_LED1_PORT, CYBSP_USER_LED1_NUM, CYBSP_LED_OFF);
     }
-
-
-    if (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(CY_CAPSENSE_ISX_BUTTON1_WDGT_ID, &cy_capsense_context))
-    {
-        Cy_GPIO_Write(CYBSP_ISX_LED1_PORT, CYBSP_ISX_LED1_NUM, CYBSP_LED_ON);
-    }
-    else
-    {
-        Cy_GPIO_Write(CYBSP_ISX_LED1_PORT, CYBSP_ISX_LED1_NUM, CYBSP_LED_OFF);
-    }
-
-    if (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(CY_CAPSENSE_ISX_BUTTON2_WDGT_ID, &cy_capsense_context))
-    {
-        Cy_GPIO_Write(CYBSP_ISX_LED2_PORT, CYBSP_ISX_LED2_NUM, CYBSP_LED_ON);
-    }
-    else
-    {
-        Cy_GPIO_Write(CYBSP_ISX_LED2_PORT, CYBSP_ISX_LED2_NUM, CYBSP_LED_OFF);
-    }
-
-    if (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(CY_CAPSENSE_ISX_BUTTON3_WDGT_ID, &cy_capsense_context))
-    {
-        Cy_GPIO_Write(CYBSP_ISX_LED3_PORT, CYBSP_ISX_LED3_NUM, CYBSP_LED_ON);
-    }
-    else
-    {
-        Cy_GPIO_Write(CYBSP_ISX_LED3_PORT, CYBSP_ISX_LED3_NUM, CYBSP_LED_OFF);
-    }
-
-    if (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(CY_CAPSENSE_ISX_BUTTON4_WDGT_ID, &cy_capsense_context))
-    {
-        Cy_GPIO_Write(CYBSP_ISX_LED4_PORT, CYBSP_ISX_LED4_NUM, CYBSP_LED_ON);
-    }
-    else
-    {
-        Cy_GPIO_Write(CYBSP_ISX_LED4_PORT, CYBSP_ISX_LED4_NUM, CYBSP_LED_OFF);
-    }
-
 }
 
 /* [] END OF FILE */
