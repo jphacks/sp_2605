@@ -31,8 +31,15 @@ class Breath:
 
     def summary(self) -> dict:
         mean = statistics.fmean(self.deltas) if self.deltas else 0.0
-        if len(self.deltas) > 1 and mean:
-            stability = max(0.0, 1.0 - statistics.pstdev(self.deltas) / abs(mean))
+        # 安定度は吹き始めと吹き終わり（各20%）を除いた真ん中で計算する。
+        # 自然な息は立ち上がりと終わりで強さが変わるので、そこを「ぶれ」と数えないため
+        core = self.deltas
+        if len(self.deltas) >= 5:
+            cut = max(1, len(self.deltas) // 5)
+            core = self.deltas[cut:-cut]
+        core_mean = statistics.fmean(core) if core else 0.0
+        if len(core) > 1 and core_mean:
+            stability = max(0.0, 1.0 - statistics.pstdev(core) / abs(core_mean))
         else:
             stability = 0.0
         return {

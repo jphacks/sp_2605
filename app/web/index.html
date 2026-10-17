@@ -23,12 +23,20 @@
     <button id="homeRecordsBtn" class="ghost">記録を見る</button>
   </section>
 
-  <!-- 演奏 -->
+  <!-- 難易度の選択（ゲームの試作） -->
+  <section id="difficulty" class="screen">
+    <h2>難易度をえらぶ</h2>
+    <div id="diffs" class="diffs"></div>
+    <button id="diffBackBtn" class="ghost">もどる</button>
+  </section>
+
+  <!-- 演奏（戦闘） -->
   <section id="play" class="screen">
     <div class="play-head">
       <span id="songTitle"></span>
       <div id="phraseDots" class="dots"></div>
     </div>
+    <div id="battle" class="battle"></div>
     <p id="prompt" class="prompt">まず、ゆっくり吸って…</p>
     <div id="noteRow" class="note-row"></div>
     <div class="flute">
@@ -46,6 +54,11 @@
 
   <!-- 結果：ふりかえり。課題①「正しくできているかわからない」②「続かない」に答える要素だけを並べる -->
   <section id="result" class="screen">
+    <div id="gameResult" class="game-result" hidden>
+      <p id="outcome" class="outcome"></p>
+      <p class="score-line">スコア <b id="score">0</b></p>
+      <div id="breakdown" class="breakdown"></div>
+    </div>
     <p class="tag">ふりかえり</p>
     <h2 id="resultHeadline" class="headline"></h2>
     <p id="resultSub" class="lead"></p>
@@ -71,7 +84,8 @@
     </details>
 
     <div class="actions">
-      <button id="againBtn" class="primary">もう1曲</button>
+      <button id="againBtn" class="primary">もう一度</button>
+      <button id="lowerBtn" class="ghost" hidden>難易度を下げる</button>
       <button id="recordsBtn" class="ghost">記録を見る</button>
       <button id="homeBtn" class="ghost">ホームへ</button>
     </div>

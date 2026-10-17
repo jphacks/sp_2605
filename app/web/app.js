@@ -2,6 +2,7 @@ import { SONGS, noteToFreq, holeFor } from "./songs.js";
 import { ensureAudio, setBreathLevel, Voice, sparkle } from "./audio.js";
 import { barChart, lineChart } from "./charts.js";
 import { showReview } from "./review.js";
+import { DIFFICULTIES, DIFFICULTY_ORDER, Battle, judgePhrase, summarize } from "./game.js";
 
 const $ = (id) => document.getElementById(id);
 const MAX_HOLD_SEC = 6; // フレーズの最後の音を伸ばせる上限
@@ -13,6 +14,7 @@ function show(id) {
 }
 let screen = "home";
 let songId = "twinkle";
+let diffKey = "beginner";
 
 function renderSongs() {
   $("songs").innerHTML = "";
@@ -57,9 +59,12 @@ function stopTrace() { clearInterval(traceTimer); traceTimer = null; }
 
 // ---------- 演奏の進行 ----------
 // ready: 吐くのを待つ / playing: 音が進む / paused: 途中で息が切れた / holding: 最後の音を伸ばしている / done
+// ゲーム：フレーズが終わるたびに、そのフレーズの息（安定度）と指穴で判定し、敵にダメージを与える。
+// 負けても曲は最後まで進む（敵を倒した後の残りはフィナーレ）。
 class Player {
-  constructor(id) {
+  constructor(id, diff) {
     this.song = SONGS[id];
+    this.diff = DIFFICULTIES[diff];
     this.phrase = 0;
     this.note = 0;
     this.state = "ready";
@@ -67,36 +72,66 @@ class Player {
     this.timer = null;
     this.hits = 0;
     this.total = 0;
+    this.results = [];
+    this.resetPhraseStats();
+    this.battle = new Battle($("battle"), id);
     this.renderPhrase();
   }
 
   get notes() { return this.song.phrases[this.phrase]; }
   get beatSec() { return 60 / this.song.bpm; }
 
+  resetPhraseStats() {
+    this.phraseBreaths = [];
+    this.phraseHits = 0;
+    this.phraseTotal = 0;
+  }
+
   exhaleStart() {
     if (this.state === "ready" || this.state === "paused") {
       this.state = "playing";
-      prompt("ゆっくり吐いて ♪", "exhale");
+      prompt(this.battle.defeated ? "フィナーレ ♪" : "ゆっくり吐いて ♪", "exhale");
       this.playNote();
     }
   }
 
-  exhaleEnd() {
+  exhaleEnd(ev) {
     if (this.state === "playing") {
       this.stopNote();
-      this.state = "paused";
-      prompt("すって… 続きからどうぞ", "inhale");
+      this.phraseBreaths.push(ev);
+      if (this.diff.missOnCut) {
+        // normal 以上：途中で息が切れたら MISS で次のフレーズへ
+        this.judge(true);
+        this.nextPhrase();
+      } else {
+        this.state = "paused";
+        prompt("すって… 続きからどうぞ", "inhale");
+      }
     } else if (this.state === "holding") {
       this.stopNote();
+      this.phraseBreaths.push(ev);
+      this.judge(false);
       this.nextPhrase();
     }
+  }
+
+  // このフレーズを判定して敵にダメージ
+  judge(cut) {
+    const stabs = this.phraseBreaths.map((b) => b?.stability).filter((s) => typeof s === "number");
+    const stability = stabs.length ? stabs.reduce((a, b) => a + b, 0) / stabs.length : 0.6;
+    const hitRatio = this.phraseTotal ? this.phraseHits / this.phraseTotal : 0;
+    const r = judgePhrase(this.diff, { stability, cut, hitRatio }, this.song.phrases.length);
+    this.results.push(r);
+    this.battle.hit(r);
+    this.resetPhraseStats();
   }
 
   playNote() {
     const [name, beats] = this.notes[this.note];
     const hole = holeFor(name);
     const clean = !!holes[hole];
-    this.voice = new Voice(noteToFreq(name), clean);
+    // hard 以上は正しい穴を押していないと鳴らない
+    this.voice = !this.diff.needHole || clean ? new Voice(noteToFreq(name), clean) : null;
     this.currentHit = clean;
     if (clean) sparkle();
     this.renderNote();
@@ -108,7 +143,7 @@ class Player {
         // 吐き続けている限り最後の音を伸ばす（上限あり）
         this.state = "holding";
         prompt("のばして〜", "exhale");
-        this.timer = setTimeout(() => { this.stopNote(); this.nextPhrase(); }, MAX_HOLD_SEC * 1000);
+        this.timer = setTimeout(() => { this.stopNote(); this.judge(false); this.nextPhrase(); }, MAX_HOLD_SEC * 1000);
       } else {
         this.stopNote(0.04);
         this.note += 1;
@@ -117,12 +152,13 @@ class Player {
     }, beats * this.beatSec * 1000);
   }
 
-  // 音の途中で正しい穴を押したら、その音を「きれい」に格上げする
+  // 音の途中で正しい穴を押したら、その音を「きれい」に格上げする（hard 以上はここで鳴り始める）
   onTouch() {
     if (this.state !== "playing" || this.currentHit) return;
-    const hole = holeFor(this.notes[this.note][0]);
-    if (holes[hole]) {
+    const name = this.notes[this.note][0];
+    if (holes[holeFor(name)]) {
       this.currentHit = true;
+      if (!this.voice) this.voice = new Voice(noteToFreq(name), true);
       sparkle();
       this.renderNote();
     }
@@ -130,7 +166,8 @@ class Player {
 
   countNote() {
     this.total += 1;
-    if (this.currentHit) this.hits += 1;
+    this.phraseTotal += 1;
+    if (this.currentHit) { this.hits += 1; this.phraseHits += 1; }
   }
 
   stopNote(release) {
@@ -166,10 +203,12 @@ class Player {
     });
     const hole = holeFor(this.notes[this.note][0]);
     document.querySelectorAll("#holes span").forEach((el, i) => {
-      el.classList.toggle("next", i === hole);
+      el.classList.toggle("next", this.diff.guide && i === hole);
       el.classList.toggle("hit", i === hole && !beforeStart && this.currentHit);
     });
   }
+
+  summary() { return summarize(this.results, this.battle.defeated); }
 
   stop() { this.stopNote(); this.state = "done"; }
 }
@@ -185,8 +224,8 @@ let waitRelease = false; // 「吹いて開始」した直後の息は演奏に�
 
 function start(byBreath) {
   ensureAudio();
-  player = new Player(songId);
-  $("songTitle").textContent = player.song.title;
+  player = new Player(songId, diffKey);
+  $("songTitle").textContent = `${player.song.title}（${diffKey}）`;
   waitRelease = byBreath;
   prompt("まず、ゆっくり吸って…", "inhale");
   show("play");
@@ -209,9 +248,41 @@ function finish(completed) {
 function showResult(r) {
   stopTrace();
   renderPhraseCharts(r.exhales || []);
+  renderGameResult(player?.summary());
   player = null;
   show("result");
   showReview(r, trace);
+}
+
+// ---------- 難易度の選択 ----------
+function renderDifficulties() {
+  $("diffs").innerHTML = "";
+  for (const key of DIFFICULTY_ORDER) {
+    const d = DIFFICULTIES[key];
+    const b = document.createElement("button");
+    b.className = "diff" + (key === diffKey ? " selected" : "");
+    b.innerHTML = `<b>${d.label}</b><span>${d.desc}</span>`;
+    b.onclick = () => { diffKey = key; start(false); };
+    $("diffs").append(b);
+  }
+}
+function showDifficulty() {
+  renderDifficulties();
+  show("difficulty");
+}
+
+// ---------- ゲームの結果発表 ----------
+function renderGameResult(s) {
+  const box = $("gameResult");
+  if (!s) { box.hidden = true; return; }
+  box.hidden = false;
+  $("outcome").textContent = s.defeated ? "勝利！" : "あと少し！ 敵は逃げていった";
+  $("outcome").className = "outcome " + (s.defeated ? "win" : "close");
+  $("score").textContent = s.score;
+  $("breakdown").innerHTML = Object.entries(s.count)
+    .filter(([tier, n]) => n || tier !== "GREAT")
+    .map(([tier, n]) => `<span class="${tier.toLowerCase()}">${tier} ${n}</span>`).join("");
+  $("lowerBtn").hidden = diffKey === DIFFICULTY_ORDER[0];
 }
 
 // ---------- グラフ ----------
@@ -264,10 +335,10 @@ function onExhaleStart() {
   if (screen === "home") { start(true); return; }
   if (screen === "play" && player && !waitRelease) player.exhaleStart();
 }
-function onExhaleEnd() {
+function onExhaleEnd(ev = {}) {
   if (screen !== "play" || !player) return;
   if (waitRelease) { waitRelease = false; prompt("吐くと演奏がはじまります", "inhale"); return; }
-  player.exhaleEnd();
+  player.exhaleEnd(ev);
 }
 
 // ---------- サーバーとの通信 ----------
@@ -281,7 +352,7 @@ function connect() {
     if (m.type === "breath") onBreathSample(m);
     else if (m.type === "breath_event") {
       if (m.event === "exhale_start") onExhaleStart();
-      if (m.event === "exhale_end" || m.event === "baseline_reset") onExhaleEnd();
+      if (m.event === "exhale_end" || m.event === "baseline_reset") onExhaleEnd(m);
     } else if (m.type === "touch" && m.source === "board") setHoles(m.holes);
     else if (m.type === "session_result") showResult(m);
     else if (m.type === "history") renderHistory(m);
@@ -322,7 +393,7 @@ addEventListener("keyup", (e) => {
     clearInterval(spaceTimer);
     if (screen === "play" && !waitRelease) send({ type: "breath_key", duration: (performance.now() - spaceStart) / 1000 });
     onBreathSample({ state: "idle", delta: 0 });
-    onExhaleEnd();
+    onExhaleEnd({ stability: 0.8, source: "keyboard" });
   }
   const i = "1234".indexOf(e.key);
   if (i >= 0) setHoles(holes.map((v, j) => (j === i ? 0 : v)));
@@ -331,7 +402,9 @@ addEventListener("keyup", (e) => {
 // ブラウザはクリック等の操作があるまで音を出せないので、最初の1回の操作で音を有効にする
 addEventListener("pointerdown", ensureAudio, { once: true });
 
-$("startBtn").onclick = () => start(false);
+$("startBtn").onclick = showDifficulty;
+$("diffBackBtn").onclick = () => show("home");
+$("lowerBtn").onclick = () => { diffKey = DIFFICULTY_ORDER[Math.max(0, DIFFICULTY_ORDER.indexOf(diffKey) - 1)]; start(false); };
 $("quitBtn").onclick = () => finish(false);
 $("againBtn").onclick = () => start(false);
 $("homeBtn").onclick = () => show("home");

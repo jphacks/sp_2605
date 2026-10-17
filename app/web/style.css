@@ -93,6 +93,40 @@ button { font: inherit; cursor: pointer; }
 
 .devbar { text-align: center; font-size: 12px; color: var(--muted); padding: 8px; }
 
+/* ゲーム（試作）：難易度・敵・判定 */
+.diffs { display: grid; gap: 10px; width: min(560px, 100%); }
+.diff { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px 18px; border-radius: 14px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); text-align: left; }
+.diff b { font-size: 18px; }
+.diff span { font-size: 13px; color: var(--muted); }
+.diff.selected, .diff:hover { border-color: var(--accent); }
+
+.battle { position: relative; width: min(620px, 100%); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.enemy-name { font-weight: 700; color: var(--muted); }
+.enemy { width: 110px; height: 84px; background: var(--enemy); border-radius: 55% 55% 40% 40% / 70% 70% 30% 30%; position: relative; animation: bob 2.4s ease-in-out infinite; box-shadow: inset 0 -10px 0 rgba(0,0,0,0.12); transition: opacity 0.8s, transform 0.8s; }
+.enemy .eyes { position: absolute; top: 34px; left: 0; right: 0; display: flex; justify-content: center; gap: 22px; }
+.enemy .eyes i { width: 12px; height: 16px; border-radius: 50%; background: #1f2a2e; }
+.enemy.shake { animation: shake 0.4s; }
+.enemy.defeated { opacity: 0; transform: scale(0.2) translateY(30px); animation: none; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+.hpbar { position: relative; width: min(320px, 90%); height: 14px; border-radius: 7px; background: var(--line); overflow: hidden; }
+.hpfill { height: 100%; width: 100%; background: linear-gradient(90deg, #e86a5a, #f2b33d); transition: width 0.6s ease; }
+.hptext { font-size: 13px; font-weight: 700; color: var(--muted); }
+.floats { position: absolute; top: 20px; left: 0; right: 0; pointer-events: none; }
+.float { position: absolute; left: 50%; transform: translateX(-50%); font-weight: 800; font-size: 26px; animation: floatUp 1.6s ease-out forwards; white-space: nowrap; }
+.float b { margin-left: 8px; font-size: 22px; }
+.float.perfect { color: #f2b33d; } .float.great { color: var(--accent); } .float.good { color: #5c9ad6; } .float.miss { color: var(--muted); }
+@keyframes floatUp { from { opacity: 0; transform: translate(-50%, 10px) scale(0.8); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.1); } to { opacity: 0; transform: translate(-50%, -40px) scale(1); } }
+
+.game-result { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+.outcome { font-size: clamp(26px, 5vw, 38px); font-weight: 800; margin: 0; }
+.outcome.win { color: #f2b33d; }
+.outcome.close { color: var(--accent); }
+.score-line { margin: 4px 0; color: var(--muted); }
+.score-line b { font-size: 32px; color: var(--ink); margin-left: 6px; }
+.breakdown { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-weight: 700; font-size: 14px; }
+.breakdown .perfect { color: #f2b33d; } .breakdown .great { color: var(--accent); } .breakdown .good { color: #5c9ad6; } .breakdown .miss { color: var(--muted); }
+
 /* ふりかえり（結果画面） */
 .headline { font-size: clamp(24px, 4.6vw, 36px); line-height: 1.4; }
 .headline .num { color: var(--accent); font-variant-numeric: tabular-nums; }
