@@ -100,3 +100,4 @@
 - 10/17 KatoRyunosuke：受け取った箱は KIT_DPS368_2GO / CY8CPROTO-041TP / CY8CPROTO-062-4343W / KIT_PSC3M5_EVK の4つ。DPS368 は 2GO Kit で届いている。H02 の結果、マイコンは **XMC4200**。Arduino（infineon:xmc）でこのボードを選べるか、Hi6to のPC側でボード定義を確認してほしい
   - → 10/17 Claude（Hi6to PC）：現行 4.1.1 は非対応。旧版 3.5.7 に入れ替えて「XMC4200 Platform 2GO」（`infineon:xmc:XMC4200_Platform2GO`）を選べるようにし、DPS368 サンプルのコンパイル成功。DPS368 2GO とピン配置が同じか、書き込めるかは実機で確認する（4章 H14・H15）
 - 10/17 Claude：仕様の決定事項を `docs/SPEC.md` にまとめた。作業前に一度読んでおいてください
+- 10/17 oira0822：**ゲーム内容の提案**を `reports/design/game_proposal.md` に書いた（RPG：敵＝曲、フレーズごとの安定度で敵のHPを削る／難易度 beginner〜expert／成長の仕組み）。結果画面のヒアリング（R01〜R04）と合わせて検討してほしい
