@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>エア・オカリナ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">エア・オカリナ</span>
+  <span id="sensor" class="pill">センサー確認中…</span>
+</header>
+
+<main>
+  <!-- ホーム -->
+  <section id="home" class="screen active">
+    <h1>吹くと、曲が進む。<br>呼吸が、ととのう。</h1>
+    <p class="lead">ストローからゆっくり息を吐くと、1フレーズずつ曲が流れます。</p>
+    <div id="songs" class="songs"></div>
+    <p class="hint breathe-hint">ストローを軽く吹いてはじめよう</p>
+    <button id="startBtn" class="primary">はじめる</button>
+  </section>
+
+  <!-- 演奏 -->
+  <section id="play" class="screen">
+    <div class="play-head">
+      <span id="songTitle"></span>
+      <div id="phraseDots" class="dots"></div>
+    </div>
+    <p id="prompt" class="prompt">まず、ゆっくり吸って…</p>
+    <div id="noteRow" class="note-row"></div>
+    <div class="flute">
+      <div class="mouth"></div>
+      <div id="holes" class="holes">
+        <span data-i="0"></span><span data-i="1"></span><span data-i="2"></span><span data-i="3"></span>
+      </div>
+    </div>
+    <div class="meter"><div id="meterFill"></div></div>
+    <div class="play-foot">
+      <label><input type="checkbox" id="followBreath" checked> 息の強さで音量を変える</label>
+      <button id="quitBtn" class="ghost">やめる</button>
+    </div>
+  </section>
+
+  <!-- 結果（内容はチームで検討中の暫定版） -->
+  <section id="result" class="screen">
+    <p class="tag">暫定の結果画面</p>
+    <h2 id="resultHeadline"></h2>
+    <div class="stats">
+      <div><b id="rAvg">-</b><span>平均の吐く長さ（秒）</span></div>
+      <div><b id="rMax">-</b><span>いちばん長い息（秒）</span></div>
+      <div><b id="rStab">-</b><span>息の安定度</span></div>
+      <div><b id="rHit">-</b><span>指穴の正解</span></div>
+    </div>
+    <div class="actions">
+      <button id="againBtn" class="primary">もう1曲</button>
+      <button id="homeBtn" class="ghost">ホームへ</button>
+    </div>
+  </section>
+</main>
+
+<footer class="devbar">開発用：スペースキー長押し＝吐く ／ 1〜4キー＝指穴</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
