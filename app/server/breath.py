@@ -13,6 +13,10 @@ STRENGTH_FULL = 300.0  # この変化量で strength = 1
 BASELINE_WARMUP = 5  # 起動直後、この数のサンプルの中央値を基準値にする
 BASELINE_FOLLOW = 0.05  # idle 中の基準値の追従の速さ（0〜1）
 BASELINE_FOLLOW_BAND = 5.0  # 基準値から ±この範囲の時だけ追従する
+# 袋に入れ直した時などに基準値がずれて「吐きっぱなし」になるのを防ぐ：
+# この秒数以上、変化がほぼ一定のまま吐く/吸う状態が続いたら基準値を測り直す
+STUCK_SEC = 12.0
+STUCK_SPREAD = 6.0
 
 
 @dataclass
@@ -79,6 +83,10 @@ class BreathDetector:
 
         if self.current is not None:
             self.current.deltas.append(delta)
+            recent = self.current.deltas[-int(STUCK_SEC * 3):]
+            if t - self.current.start > STUCK_SEC and max(recent) - min(recent) < STUCK_SPREAD:
+                self.reset()
+                return None, [{"type": "breath_event", "event": "baseline_reset", "t": round(t, 3)}]
 
         strength = max(0.0, min(1.0, delta / STRENGTH_FULL)) if self.state == "exhale" else 0.0
         msg = {
@@ -90,6 +98,13 @@ class BreathDetector:
             "strength": round(strength, 3),
         }
         return msg, events
+
+    def reset(self) -> None:
+        """基準値を測り直す（次の数サンプルで決め直す）。"""
+        self.baseline = None
+        self._warmup = []
+        self.state = "idle"
+        self.current = None
 
     def _start(self, kind: str, t: float) -> dict:
         self.state = kind

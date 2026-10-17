@@ -224,7 +224,7 @@ function connect() {
     if (m.type === "breath") onBreathSample(m);
     else if (m.type === "breath_event") {
       if (m.event === "exhale_start") onExhaleStart();
-      if (m.event === "exhale_end") onExhaleEnd();
+      if (m.event === "exhale_end" || m.event === "baseline_reset") onExhaleEnd();
     } else if (m.type === "touch" && m.source === "board") setHoles(m.holes);
     else if (m.type === "session_result") showResult(m);
     else if (m.type === "status") setSensor(m.mock ? "センサー：疑似データ" : m.dps ? "センサー：接続中" : "センサー：未接続", m.dps);
