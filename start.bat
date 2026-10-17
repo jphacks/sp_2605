@@ -1,11 +1,10 @@
 @echo off
-rem ã‚¨ã‚¢ãƒ»ã‚ªã‚«ãƒªãƒŠã‚’èµ·å‹•ã™ã‚‹ï¼ˆãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã§å‹•ãï¼‰ã€‚ãƒœãƒ¼ãƒ‰ã® COM ãƒãƒ¼ãƒˆã¯è‡ªå‹•ã§æŽ¢ã™ã€‚
-chcp 65001 > nul
+rem ƒGƒAEƒIƒJƒŠƒi‚ð‹N“®‚·‚éiƒ_ƒuƒ‹ƒNƒŠƒbƒN‚Å“®‚­jBƒ{[ƒh‚Ì COM ƒ|[ƒg‚ÍŽ©“®‚Å’T‚·B
 cd /d %~dp0
 set PY=py
 where py > nul 2> nul || set PY=python
 %PY% -m pip install -q -r requirements.txt
-rem ã‚µãƒ¼ãƒãƒ¼ãŒç«‹ã¡ä¸ŠãŒã£ã¦ã‹ã‚‰ãƒ–ãƒ©ã‚¦ã‚¶ã‚’é–‹ã
+rem ƒT[ƒo[‚ª—§‚¿ã‚ª‚Á‚Ä‚©‚çƒuƒ‰ƒEƒU‚ðŠJ‚­
 start "" cmd /c "timeout /t 3 > nul & start http://localhost:8000/"
 %PY% app\server\main.py %*
 pause

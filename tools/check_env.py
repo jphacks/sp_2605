@@ -5,9 +5,15 @@
 結果の [OK] / [NG] / [--] を見て、NG があれば docs/SETUP.md の手順で直す。
 """
 import importlib
+import os
 import shutil
 import socket
 import sys
+
+# Git Bash（Claude Code の Bash ツール）から実行したときに日本語が文字化けしないように
+if os.environ.get("MSYSTEM"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 ok = True
 

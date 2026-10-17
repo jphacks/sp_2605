@@ -12,6 +12,8 @@ import argparse
 import asyncio
 import json
 import mimetypes
+import os
+import sys
 from datetime import datetime
 from http import HTTPStatus
 from pathlib import Path
@@ -25,6 +27,11 @@ import records
 import store
 from breath import BreathDetector
 from serial_io import SerialReader, mock_pressure, parse_pressure, parse_touch
+
+# Git Bash（Claude Code の Bash ツール）から実行したときに日本語が文字化けしないように
+if os.environ.get("MSYSTEM"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 RAW_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
