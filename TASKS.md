@@ -35,8 +35,8 @@
 | H04 | [x] | KatoRyunosuke | **PSOC 4100T Plus の認識確認**：USB で挿して、PowerShell で次を実行し出力を貼る：`Get-PnpDevice -PresentOnly \| Where-Object FriendlyName -match 'KitProg\|COM\|CMSIS'`。「KitProg3」や「USB シリアル デバイス (COMx)」が出ればOK。※ Hi6to のPCの **COM6・COM7 は Bluetooth なのでボードではない** | 結果：10/17 KatoRyunosuke（Kato のPC）：OK。`KitProg3 USB-UART (COM3)` / `KitProg3 bridge` / `KitProg3 CMSIS-DAP` が出た。スクショ `reports/boards/H04_PSOC4100TPlus_認識_KatoPC.png`。※COM番号は PC ごとに変わる |
 | H05 | [x] | KatoRyunosuke | **DPS368 側のボードの認識確認**：H02 が (a) か (c) なら、そのボードを挿して H04 と同じコマンドを実行し出力を貼る。(b) の場合はスキップして「(b) のためスキップ」と書く | 結果：10/17 KatoRyunosuke（Kato のPC）：OK（H02 は (a)）。DPS368 2GO を単体で挿すと `USB シリアル デバイス (COM4)` が出た（KitProg は出ない）。スクショ `reports/boards/H05_DPS368_2GO_認識_KatoPC.png`。※COM番号は PC ごとに変わる |
 | H06a | [ ] | 誰でも | **2枚同時接続（自分のPCで先行確認）**：①何も挿さずに H04 のコマンドを実行して出力をメモ → ② PSOC 4100T Plus（Type-C）だけ挿して実行 → ③ そのまま DPS368 2GO（Micro-B）も挿して実行。③で `KitProg3 USB-UART (COMx)` と `USB シリアル デバイス (COMy)` の**両方が同時に出るか**、それぞれの番号を書く。片方が消える場合は USB ハブをやめて PC に直接挿して再確認 | 結果： |
-| H06b | [ ] | 誰でも | **DPS368 2GO の最初からの出力を読む（読むだけ。ボードの中身は変えない）**：DPS368 2GO を挿した状態で、PowerShell で `py -m pip install pyserial` → `py -c "import serial,time;s=serial.Serial('COM4',115200,timeout=1);time.sleep(5);print(s.read(500))"`（COM4 は H06a で出た番号に置き換える）。出力をそのまま貼る。`b''`（空）なら「何も出ない」と書く | 結果： |
-| H06 | [ ] | Hi6to | **2枚同時接続（本番のPC）**：H06a と同じ手順を Hi6to のPCで行う。1枚挿すごとに Claude に声をかけ、COM番号の確認と DPS368 2GO の出力の読み取りを Claude が行う | 結果： |
+| H06b | [x] | 誰でも | **DPS368 2GO の最初からの出力を読む（読むだけ。ボードの中身は変えない）**：DPS368 2GO を挿した状態で、PowerShell で `py -m pip install pyserial` → `py -c "import serial,time;s=serial.Serial('COM4',115200,timeout=1);time.sleep(5);print(s.read(500))"`（COM4 は H06a で出た番号に置き換える）。出力をそのまま貼る。`b''`（空）なら「何も出ない」と書く | 結果：10/17 Claude（Hi6to PC で実施）：**9600bps で `Pressure[Pascal]:102218.73` の形式で気圧が出ている**。ただし **約3.2回/秒（314ms間隔）と遅い**。静止時のぶれ 標準偏差 約4Pa。※他のメンバーは実施不要 |
+| H06 | [x] | Hi6to | **2枚同時接続（本番のPC）**：H06a と同じ手順を Hi6to のPCで行う。1枚挿すごとに Claude に声をかけ、COM番号の確認と DPS368 2GO の出力の読み取りを Claude が行う | 結果：10/17 Claude（Hi6to PC）：OK。2枚同時に認識。**PSOC 4100T Plus = COM3**（KitProg3 bridge / CMSIS-DAP も表示、書き込みツール fw-loader からも見える。KitProg3 FW は古いが今は更新しない）、**DPS368 2GO = COM4**（USB の VID が SEGGER＝基板に J-Link 内蔵）。COM6・7 は Bluetooth |
 
 ## 2. 動作確認（サンプルの書き込みは Hi6to のPCで、触る・吹く確認は誰でも）
 
@@ -70,7 +70,7 @@
 | ID | 状態 | 担当 | タスク | 確認方法・結果 |
 |---|---|---|---|---|
 | H14 | [ ] | Hi6to | SEGGER の公式サイトから **J-Link Software and Documentation Pack（Windows 64bit）** をダウンロードしてインストール（ライセンスへの同意が必要なので本人が行う） | 結果： |
-| H15 | [ ] | Hi6to | DPS368 2GO を Hi6to のPCに挿し、Claude に「DPS368 2GO を確認して」と頼む。Claude が (1) 最初から入っているプログラムの出力を読む (2) J-Link で書き込めるかを確認する | 結果： |
+| H15 | [~] | Hi6to | DPS368 2GO を Hi6to のPCに挿し、Claude に「DPS368 2GO を確認して」と頼む。Claude が (1) 最初から入っているプログラムの出力を読む (2) J-Link で書き込めるかを確認する | 結果：10/17 Claude：(1) 最初からのプログラムは 9600bps・約3回/秒で気圧を出力（H06b）。楽器には遅いので、速い自作プログラムを書き込みたい → (2) J-Link での書き込み確認は H14 の後 |
 
 ## 5. チームで決めること（ヒアリング）
 
