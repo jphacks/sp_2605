@@ -564,7 +564,6 @@ void init_cycfg_pins(void)
 {
     Cy_GPIO_Pin_Init(CYBSP_CS_SHIELD1_PORT, CYBSP_CS_SHIELD1_PIN, &CYBSP_CS_SHIELD1_config);
     Cy_GPIO_Pin_Init(CYBSP_CSD_PROX_PORT, CYBSP_CSD_PROX_PIN, &CYBSP_CSD_PROX_config);
-    Cy_GPIO_Pin_Init(ioss_0_port_2_pin_3_PORT, ioss_0_port_2_pin_3_PIN, &ioss_0_port_2_pin_3_config);
     Cy_GPIO_Pin_Init(ioss_0_port_2_pin_4_PORT, ioss_0_port_2_pin_4_PIN, &ioss_0_port_2_pin_4_config);
     Cy_GPIO_Pin_Init(ioss_0_port_2_pin_5_PORT, ioss_0_port_2_pin_5_PIN, &ioss_0_port_2_pin_5_config);
     Cy_GPIO_Pin_Init(ioss_0_port_2_pin_6_PORT, ioss_0_port_2_pin_6_PIN, &ioss_0_port_2_pin_6_config);
@@ -575,6 +574,7 @@ void init_cycfg_pins(void)
     Cy_GPIO_Pin_Init(CYBSP_ISX_LED1_PORT, CYBSP_ISX_LED1_PIN, &CYBSP_ISX_LED1_config);
     Cy_GPIO_Pin_Init(CYBSP_ISX_LED4_PORT, CYBSP_ISX_LED4_PIN, &CYBSP_ISX_LED4_config);
     Cy_GPIO_Pin_Init(CYBSP_CSX_BTN0_RX_PORT, CYBSP_CSX_BTN0_RX_PIN, &CYBSP_CSX_BTN0_RX_config);
+    Cy_GPIO_Pin_Init(CYBSP_CSD_BTN1_PORT, CYBSP_CSD_BTN1_PIN, &CYBSP_CSD_BTN1_config);
     Cy_GPIO_Pin_Init(CYBSP_CSX_BTN0_TX_PORT, CYBSP_CSX_BTN0_TX_PIN, &CYBSP_CSX_BTN0_TX_config);
     Cy_GPIO_Pin_Init(CYBSP_UART_RX_PORT, CYBSP_UART_RX_PIN, &CYBSP_UART_RX_config);
     Cy_GPIO_Pin_Init(CYBSP_UART_TX_PORT, CYBSP_UART_TX_PIN, &CYBSP_UART_TX_config);

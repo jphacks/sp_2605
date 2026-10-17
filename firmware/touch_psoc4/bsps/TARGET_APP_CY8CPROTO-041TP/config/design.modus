@@ -657,7 +657,7 @@
                         <Port name="ioss[0].port[4].pin[3].analog[0]"/>
                     </Arm>
                     <Arm>
-                        <Port name="ioss[0].port[4].pin[5].analog[0]"/>
+                        <Port name="ioss[0].port[2].pin[3].analog[0]"/>
                     </Arm>
                     <Arm>
                         <Port name="ioss[0].port[2].pin[0].analog[0]"/>

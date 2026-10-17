@@ -40,10 +40,10 @@ extern "C" {
 #define ioss_0_port_2_pin_0_HSIOM HSIOM_SEL_AMUXA
 #define ioss_0_port_2_pin_1_HSIOM HSIOM_SEL_AMUXA
 #define ioss_0_port_2_pin_2_HSIOM HSIOM_SEL_AMUXA
+#define ioss_0_port_2_pin_3_HSIOM HSIOM_SEL_AMUXA
 #define ioss_0_port_3_pin_2_HSIOM P3_2_CPUSS_SWD_DATA
 #define ioss_0_port_3_pin_3_HSIOM P3_3_CPUSS_SWD_CLK
 #define ioss_0_port_4_pin_3_HSIOM HSIOM_SEL_AMUXA
-#define ioss_0_port_4_pin_5_HSIOM HSIOM_SEL_AMUXA
 #define ioss_0_port_6_pin_3_HSIOM P6_3_SCB1_I2C_SCL
 #define ioss_0_port_6_pin_4_HSIOM P6_4_SCB1_I2C_SDA
 
