@@ -30,7 +30,7 @@
 | ID | 状態 | 担当 | タスク | 確認方法・結果 |
 |---|---|---|---|---|
 | H01 | [~] | KatoRyunosuke | **受け取ったものを全部記録**：箱・袋の中身を並べて1枚撮影 → 各ボードの表と裏（型番のシール・印刷）を撮影。下の「ボード情報」表に型番を書く。付属品（USBケーブル・ピンヘッダ・センサー基板など）も書く | 結果：10/17 KatoRyunosuke：箱3つの表・裏を撮影し `reports/boards/*_箱表.jpg / *_箱裏.jpg` に追加。型番を下の表に記入。DPS368 は KIT_DPS368_2GO（箱を追加）。残り：箱から出した中身の全体写真・各ボードの表裏・付属品 |
-| H02 | [ ] | 誰でも | **DPS368 の形を判定**：(a) USB コネクタが付いていて単体で PC につながる / (b) 小さなセンサー基板だけ（ピンが数本出ているだけ） / (c) PSOC6 ボードの上に最初から載っている。どれか書き、(b) ならピンに印刷された文字（VDD, GND, SDA, SCL など）も書く | 結果： |
+| H02 | [x] | KatoRyunosuke | **DPS368 の形を判定**：(a) USB コネクタが付いていて単体で PC につながる / (b) 小さなセンサー基板だけ（ピンが数本出ているだけ） / (c) PSOC6 ボードの上に最初から載っている。どれか書き、(b) ならピンに印刷された文字（VDD, GND, SDA, SCL など）も書く | 結果：10/17 KatoRyunosuke：**(a)**。基板名 DPS368-PS2GO-Kit V1.1。Micro-B USB 付きで、マイコン XMC4200 が載っていて単体で PC につながる。DPS368 は基板の端（切り離し線の先）に載っている。写真は `reports/boards/KIT_DPS368_2GO_表.jpg / _裏.jpg` |
 | H03 | [ ] | 誰でも | **USB ケーブルの確認**：コネクタの形（Type-C / Micro-B）と本数を書く。ボードをPCに挿して、**ボードのLEDが点くか**と、PCで「デバイスを接続した音」が鳴るかを書く | 結果： |
 | H04 | [ ] | 誰でも | **PSOC 4100T Plus の認識確認**：USB で挿して、PowerShell で次を実行し出力を貼る：`Get-PnpDevice -PresentOnly \| Where-Object FriendlyName -match 'KitProg\|COM\|CMSIS'`。「KitProg3」や「USB シリアル デバイス (COMx)」が出ればOK。※ Hi6to のPCの **COM6・COM7 は Bluetooth なのでボードではない** | 結果： |
 | H05 | [ ] | 誰でも | **DPS368 側のボードの認識確認**：H02 が (a) か (c) なら、そのボードを挿して H04 と同じコマンドを実行し出力を貼る。(b) の場合はスキップして「(b) のためスキップ」と書く | 結果： |
@@ -64,7 +64,7 @@
 
 | ボード | 型番 | USBの形 | 付属品 | 備考 |
 |---|---|---|---|---|
-| DPS368 | KIT_DPS368_2GO（XENSIV DPS368 Pressure Sensor 2GO Kit、Ordering code: SP005729572） | （未確認） | （未確認） | 形の判定（H02）：未。箱を開けて確認する |
+| DPS368 | KIT_DPS368_2GO（XENSIV DPS368 Pressure Sensor 2GO Kit、基板表記 DPS368-PS2GO-Kit V1.1、Ordering code: SP005729572） | Micro-B | （未確認） | 形の判定（H02）：(a)。マイコンは XMC4200。DPS368 部分は切り離し線の先にあり、ピンは SDI / SCK / SDO / GND / CSBN / VDDIO / VDD / GND。**切り離し線で折らないこと** |
 | PSOC 4100T Plus | CY8CPROTO-041TP（PSOC 4100T Plus CAPSENSE Prototyping Kit） | USB Type-C（J1・説明書より） | （未確認） | タッチボタン CSB1/CSB2、タッチパッド CST1、近接センサー CSP1 付き |
 | PSOC6 EVK | CY8CPROTO-062-4343W（PSoC 6 Wi-Fi BT Prototyping Kit） | （未確認） | （未確認） | KitProg3 USB は J8。電源ジャンパ J3 は 2-3（3.3V）。PDMマイク・サーミスタ・CapSenseスライダー付き。気圧センサーは載っていない |
 | その他 | KIT_PSC3M5_EVK（PSOC Control C3M5 Evaluation Kit） | （未確認） | （未確認） | Arduino互換・Shield2Go・mikroBUS コネクタ付き。今回の作品で使うかは未定 |
@@ -76,4 +76,4 @@
 ## 気づいたこと・質問
 
 - （コードの修正提案や、困ったことはここに書く）
-- 10/17 KatoRyunosuke：受け取った箱は KIT_DPS368_2GO / CY8CPROTO-041TP / CY8CPROTO-062-4343W / KIT_PSC3M5_EVK の4つ。DPS368 は 2GO Kit で届いている。2GO Kit なら Arduino の infineon:xmc で使える可能性があるので、H02 で形を確認したら Hi6to のPC側でボード定義を確認してほしい
+- 10/17 KatoRyunosuke：受け取った箱は KIT_DPS368_2GO / CY8CPROTO-041TP / CY8CPROTO-062-4343W / KIT_PSC3M5_EVK の4つ。DPS368 は 2GO Kit で届いている。H02 の結果、マイコンは **XMC4200**。Arduino（infineon:xmc）でこのボードを選べるか、Hi6to のPC側でボード定義を確認してほしい
