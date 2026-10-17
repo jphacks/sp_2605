@@ -1,5 +1,6 @@
 import { burst, confetti, shake, flash } from "./fx.js";
 import { hitSfx, defeatSfx } from "./audio.js";
+import { avatarSVG, titleFor } from "./avatar.js";
 
 // ゲーム（RPG）の試作：難易度・フレーズごとの判定・ダメージ・敵の表示。
 // 数値はすべて仮。チームの計測（TASKS の R07）とヒアリング（R06）で決まったら、ここだけ変える。
@@ -25,11 +26,12 @@ export const GAME = {
   basePhrases: 6,
 };
 
-// 敵（イラストはメンバーが描いたものに差し替える予定。今は図形の仮のキャラ）
-export const ENEMIES = {
-  twinkle: { name: "ほしスライム", color: "#6cc5b0" },
-  joy: { name: "よろこびドラゴン", color: "#e6a04b" },
-};
+// ステージ（敵ごとに1つ）。背景・推奨レベルつき。ロックはせず、推奨レベルを表示するだけ（発表で好きなステージを選べるように）
+// 敵の見た目はメンバーが描いたイラストに差し替える予定。今は図形の仮のキャラ
+export const STAGES = [
+  { id: "meadow", no: 1, name: "ほしのそうげん", song: "twinkle", bg: "meadow", rec: 1, enemy: { name: "ほしスライム", color: "#6cc5b0" } },
+  { id: "volcano", no: 2, name: "よろこびのかざん", song: "joy", bg: "volcano", rec: 3, enemy: { name: "よろこびドラゴン", color: "#e6a04b" } },
+];
 
 // フレーズ1つの判定
 //  stability: そのフレーズで吐いた息の安定度（0〜1）／ cut: 途中で息が切れた ／ hitRatio: 正しい穴を押せた割合
@@ -61,35 +63,92 @@ const TIER_FX = {
 };
 
 export class Battle {
-  constructor(root, songId) {
-    const enemy = ENEMIES[songId] || { name: "まものスライム", color: "#8fa3a8" };
+  // stage: STAGES の1つ ／ me: { level, exp, next }（プレイヤーの成長）
+  constructor(root, stage, me) {
+    const enemy = stage.enemy;
     this.hp = GAME.hp;
     this.defeated = false;
+    this.enemyName = enemy.name;
+    this.me = me;
     root.innerHTML = `
-      <div class="enemy-name">${enemy.name}</div>
-      <div class="enemy-wrap"><div class="enemy" style="--enemy:${enemy.color}"><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div></div>
-      <div class="hpbar"><div class="hpghost"></div><div class="hpfill"></div></div>
-      <span class="hptext">HP ${this.hp}</span>
-      <div class="judge-banner"></div>
-      <div class="combo"></div>
-      <div class="dmg-layer"></div>`;
+      <div class="scene ${stage.bg}">
+        <div class="bg-deco"></div>
+        <div class="win enemy-win">
+          <div class="win-name">${enemy.name}</div>
+          <div class="hpbar"><div class="hpghost"></div><div class="hpfill"></div></div>
+          <span class="hptext">HP ${this.hp}</span>
+        </div>
+        <div class="enemy-spot">
+          <div class="platform"></div>
+          <div class="enemy" style="--enemy:${enemy.color}"><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+          <div class="dmg-layer"></div>
+        </div>
+        <div class="avatar-spot">
+          <div class="platform"></div>
+          <div class="avatar">${avatarSVG(me.level, "normal")}</div>
+        </div>
+        <div class="win status-win">
+          <div class="win-name">あなた <span class="lv">Lv ${me.level}</span></div>
+          <div class="st-title">${titleFor(me.level)}</div>
+          <div class="st-row"><span>いき</span><span class="pips len"></span></div>
+          <div class="st-row"><span>しずか</span><span class="pips calm"></span></div>
+          <div class="st-row"><span>ちょうし</span><b class="mood">ふつう</b></div>
+          <div class="expbar" title="経験値"><i style="width:${Math.round((me.exp / me.next) * 100)}%"></i></div>
+        </div>
+        <div class="judge-banner"></div>
+        <div class="combo"></div>
+      </div>`;
     this.root = root;
+    this.scene = root.querySelector(".scene");
     this.enemyEl = root.querySelector(".enemy");
-    this.wrap = root.querySelector(".enemy-wrap");
+    this.avatarEl = root.querySelector(".avatar");
     this.fill = root.querySelector(".hpfill");
     this.ghost = root.querySelector(".hpghost");
     this.text = root.querySelector(".hptext");
     this.banner = root.querySelector(".judge-banner");
     this.comboEl = root.querySelector(".combo");
     this.dmgLayer = root.querySelector(".dmg-layer");
+    this.mood = "normal";
+    this.setStatus({ len: 0, calm: 0, mood: "normal" });
+    this.say(`${enemy.name}が あらわれた！`);
   }
 
   get target() { return this.enemyEl; }
+  get origin() { return this.avatarEl; }
 
-  // 吹いている間、敵が「効いている」様子で震える
+  // メッセージウィンドウに1行ずつ文字を出す（RPG のように）
+  say(text) {
+    const el = document.getElementById("battleLog");
+    if (!el) return;
+    clearInterval(this.typing);
+    let i = 0;
+    el.textContent = "";
+    this.typing = setInterval(() => {
+      el.textContent = text.slice(0, ++i);
+      if (i >= text.length) clearInterval(this.typing);
+    }, 35);
+  }
+
+  // 呼吸の調子をステータスウィンドウに出す（len・calm は 0〜1）
+  setStatus({ len, calm, mood }) {
+    const pips = (v) => Array.from({ length: 5 }, (_, i) => `<i class="${i < Math.round(v * 5) ? "on" : ""}"></i>`).join("");
+    this.root.querySelector(".pips.len").innerHTML = pips(len);
+    this.root.querySelector(".pips.calm").innerHTML = pips(calm);
+    const label = { great: "ぜっこうちょう", good: "いいかんじ", normal: "ふつう", rough: "みだれぎみ" }[mood];
+    const m = this.root.querySelector(".mood");
+    m.textContent = label;
+    m.className = `mood ${mood}`;
+    if (mood !== this.mood) {
+      this.mood = mood;
+      this.avatarEl.innerHTML = avatarSVG(this.me.level, mood);
+    }
+  }
+
+  // 吹いている間、アバターは息を吹き、敵は「効いている」様子で震える
   setBreath(level) {
     this.enemyEl.style.setProperty("--tremble", `${Math.round(level * 4)}px`);
     this.enemyEl.classList.toggle("taking", level > 0.15 && !this.defeated);
+    this.avatarEl.classList.toggle("blowing", level > 0.15);
   }
 
   restart(el, cls) {
@@ -100,13 +159,11 @@ export class Battle {
 
   // 判定を表示してダメージを与える。この攻撃で倒したら true
   hit({ tier, damage }, combo) {
-    // 中央の大きな判定
     this.banner.className = `judge-banner ${tier.toLowerCase()}`;
     this.banner.innerHTML = tier === "MISS" ? "MISS…" : `${tier}!`;
     this.restart(this.banner, "show");
     hitSfx(tier);
 
-    // コンボ
     if (combo >= 2 && tier !== "MISS") {
       this.comboEl.innerHTML = `<b>${combo}</b> COMBO!`;
       this.restart(this.comboEl, "show");
@@ -114,17 +171,18 @@ export class Battle {
 
     if (tier === "MISS" || !damage) {
       this.restart(this.enemyEl, "dodge");
+      this.say(`${this.enemyName}は ひらりと かわした！`);
       return false;
     }
 
-    // 敵：白く光る・のけぞる・つぶれる
+    // アバターの攻撃 → 敵：白く光る・のけぞる・つぶれる
+    this.restart(this.avatarEl, "attack");
     this.restart(this.enemyEl, tier === "PERFECT" ? "hit-big" : "hit");
     const f = TIER_FX[tier];
     burst(this.enemyEl, f);
     shake(this.root.closest(".screen"), f.shake);
     if (tier === "PERFECT") flash("rgba(255, 220, 120, 0.35)");
 
-    // 敵から飛び出すダメージの数字
     const d = document.createElement("div");
     d.className = `dmg ${tier.toLowerCase()}`;
     d.textContent = damage;
@@ -132,9 +190,14 @@ export class Battle {
     this.dmgLayer.append(d);
     setTimeout(() => d.remove(), 1400);
 
-    if (this.defeated) return false; // フィナーレ中はダメージ表示だけ
+    if (this.defeated) {
+      this.say(`フィナーレ！ ${damage}の ボーナス！`);
+      return false;
+    }
+    this.say(tier === "PERFECT"
+      ? `かいしんの いき！ ${this.enemyName}に ${damage}の ダメージ！`
+      : `${this.enemyName}に ${damage}の ダメージ！`);
 
-    // HP：先に本体が減り、白い残像が遅れて追いかける
     this.hp = Math.max(0, this.hp - damage);
     const pct = `${(this.hp / GAME.hp) * 100}%`;
     this.fill.style.width = pct;
@@ -156,10 +219,12 @@ export class Battle {
     burst(this.enemyEl, { colors: ["#ffd166", "#e86a5a", "#ffffff", "#5cc2b3", "#b48ae6"], count: 160, speed: 900, size: 8, stars: true });
     shake(this.root.closest(".screen"), 2.4);
     this.enemyEl.classList.add("defeated");
+    this.avatarEl.classList.add("cheer");
     this.banner.className = "judge-banner defeat";
     this.banner.textContent = "DEFEATED!";
     this.restart(this.banner, "show");
-    this.text.textContent = "たおした！ ここからフィナーレ";
+    this.text.textContent = "たおした！";
+    this.say(`${this.enemyName}を たおした！ ここから フィナーレ！`);
     confetti();
   }
 }

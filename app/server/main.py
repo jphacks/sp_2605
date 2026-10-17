@@ -20,6 +20,7 @@ from websockets.asyncio.server import broadcast, serve
 from websockets.datastructures import Headers
 from websockets.http11 import Response
 
+import growth
 import store
 from breath import BreathDetector
 from serial_io import SerialReader, mock_pressure, parse_pressure, parse_touch
@@ -63,9 +64,11 @@ async def handler(ws):
             if kind == "session_start":
                 session = store.Session(msg.get("song", "unknown"))
             elif kind == "session_end" and session is not None:
-                result = session.finish(bool(msg.get("completed")))
+                result = session.finish(bool(msg.get("completed")), msg.get("game"))
                 session = None
                 send_all({"type": "session_result", **result})
+            elif kind == "get_profile":
+                await ws.send(json.dumps({"type": "profile", **growth.public(growth.load())}, ensure_ascii=False))
             elif kind == "get_history":
                 await ws.send(json.dumps({"type": "history", **store.history()}, ensure_ascii=False))
             elif kind == "breath_key" and session is not None:

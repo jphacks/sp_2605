@@ -103,6 +103,13 @@ export function defeatSfx() {
   [523, 659, 784, 1046].forEach((f, i) => tone(f, t + 0.35 + i * 0.12, 0.35, { type: "square", gain: 0.07 }));
 }
 
+export function levelUpSfx() {
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  [[523, 0], [523, 0.12], [523, 0.24], [698, 0.36], [784, 0.6], [1046, 0.84]].forEach(([f, d]) =>
+    tone(f, t + d, d < 0.8 ? 0.16 : 0.6, { type: "square", gain: 0.08 }));
+}
+
 // 正しい穴を押した時のきらっとした効果音
 export function sparkle() {
   if (!ctx) return;

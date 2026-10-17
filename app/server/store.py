@@ -7,6 +7,8 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+import growth
+
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 SESSIONS = DATA_DIR / "sessions.jsonl"
 SAMPLE = DATA_DIR / "sample_sessions.jsonl"
@@ -22,7 +24,7 @@ class Session:
         if event.get("event") == "exhale_end":
             self.exhales.append(event)
 
-    def finish(self, completed: bool) -> dict:
+    def finish(self, completed: bool, game: dict | None = None) -> dict:
         ex = self.exhales
         durations = [e["duration"] for e in ex]
         result = {
@@ -50,7 +52,12 @@ class Session:
         DATA_DIR.mkdir(exist_ok=True)
         with SESSIONS.open("a", encoding="utf-8") as f:
             saved = {k: v for k, v in result.items() if k not in ("prev", "best")}
+            if game:
+                saved["game"] = game
             f.write(json.dumps(saved, ensure_ascii=False) + "\n")
+        # 最後まで演奏したときだけ経験値をもらえる
+        if completed and result["exhale_count"]:
+            result["growth"] = growth.award(result, game)
         return result
 
 

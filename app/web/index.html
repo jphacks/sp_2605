@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>エア・オカリナ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,7 +19,16 @@
   <section id="home" class="screen active">
     <h1>吹くと、曲が進む。<br>呼吸が、ととのう。</h1>
     <p class="lead">ストローからゆっくり息を吐くと、1フレーズずつ曲が流れます。</p>
-    <div id="songs" class="songs"></div>
+    <div class="me-card win">
+      <div id="homeAvatar" class="home-avatar"></div>
+      <div class="me-info">
+        <div class="win-name">あなた <span id="homeLv" class="lv">Lv 1</span></div>
+        <div id="homeTitle" class="st-title"></div>
+        <div class="expbar"><i id="homeExp"></i></div>
+        <div id="homeNext" class="me-next"></div>
+      </div>
+    </div>
+    <div id="songs" class="stages"></div>
     <p class="hint breathe-hint">ストローを軽く吹いてはじめよう</p>
     <button id="startBtn" class="primary">はじめる</button>
     <button id="homeRecordsBtn" class="ghost">記録を見る</button>
@@ -33,12 +44,15 @@
   <!-- 演奏（戦闘） -->
   <section id="play" class="screen">
     <div class="play-head">
-      <span id="songTitle"></span>
+      <span id="songTitle" class="stage-label"></span>
       <div id="phraseDots" class="dots"></div>
     </div>
     <div id="battle" class="battle"></div>
-    <p id="prompt" class="prompt">まず、ゆっくり吸って…</p>
-    <div id="noteRow" class="note-row"></div>
+    <div class="win msg-win">
+      <p id="battleLog" class="battle-log"></p>
+      <p id="prompt" class="prompt">まず、ゆっくり吸って…</p>
+      <div id="noteRow" class="note-row"></div>
+    </div>
     <div class="flute">
       <div class="mouth"></div>
       <div id="holes" class="holes">
@@ -58,6 +72,19 @@
       <p id="outcome" class="outcome"></p>
       <p class="score-line">スコア <b id="score">0</b></p>
       <div id="breakdown" class="breakdown"></div>
+    </div>
+    <div id="growth" class="win growth-win" hidden>
+      <div class="growth-head">
+        <div id="growthAvatar" class="growth-avatar"></div>
+        <div>
+          <p id="growthGain" class="growth-gain"></p>
+          <p id="growthLevel" class="growth-level"></p>
+          <div class="expbar big"><i id="growthExp"></i></div>
+          <p id="growthNext" class="me-next"></p>
+        </div>
+      </div>
+      <ul id="growthLines" class="growth-lines"></ul>
+      <p id="growthStage" class="growth-stage"></p>
     </div>
     <p class="tag">ふりかえり</p>
     <h2 id="resultHeadline" class="headline"></h2>

@@ -1,8 +1,9 @@
 import { SONGS, noteToFreq, holeFor } from "./songs.js";
-import { ensureAudio, setBreathLevel, Voice, sparkle } from "./audio.js";
+import { ensureAudio, setBreathLevel, Voice, sparkle, levelUpSfx } from "./audio.js";
 import { barChart, lineChart } from "./charts.js";
 import { showReview } from "./review.js";
-import { DIFFICULTIES, DIFFICULTY_ORDER, Battle, judgePhrase, summarize } from "./game.js";
+import { DIFFICULTIES, DIFFICULTY_ORDER, STAGES, Battle, judgePhrase, summarize } from "./game.js";
+import { avatarSVG, titleFor, newGearAt } from "./avatar.js";
 import { setStream, confetti } from "./fx.js";
 
 const $ = (id) => document.getElementById(id);
@@ -17,15 +18,30 @@ let screen = "home";
 let songId = "twinkle";
 let diffKey = "beginner";
 
+// ---------- ステージの選択とプレイヤーの成長（ホーム） ----------
+let me = { level: 1, exp: 0, next: 80 };
+const currentStage = () => STAGES.find((s) => s.song === songId) || STAGES[0];
+
 function renderSongs() {
   $("songs").innerHTML = "";
-  for (const [id, s] of Object.entries(SONGS)) {
+  for (const st of STAGES) {
     const b = document.createElement("button");
-    b.className = "song" + (id === songId ? " selected" : "");
-    b.textContent = s.title;
-    b.onclick = () => { songId = id; renderSongs(); };
+    b.className = `stage-card ${st.bg}` + (st.song === songId ? " selected" : "");
+    b.innerHTML = `<span class="stage-no">STAGE ${st.no}</span><b>${st.name}</b>
+      <span class="stage-enemy">${st.enemy.name}</span>
+      <span class="stage-rec ${me.level >= st.rec ? "ok" : ""}">すいしょう Lv ${st.rec}</span>`;
+    b.onclick = () => { songId = st.song; renderSongs(); };
     $("songs").append(b);
   }
+}
+
+function renderMe() {
+  $("homeAvatar").innerHTML = avatarSVG(me.level, "good");
+  $("homeLv").textContent = `Lv ${me.level}`;
+  $("homeTitle").textContent = titleFor(me.level);
+  $("homeExp").style.width = `${Math.round((me.exp / me.next) * 100)}%`;
+  $("homeNext").textContent = `つぎの レベルまで あと ${me.next - me.exp}`;
+  renderSongs();
 }
 
 // ---------- 指穴（ボード or キーボード 1〜4） ----------
@@ -46,7 +62,7 @@ function onBreathSample(m) {
   breathLevel = level;
   // 吹いている間、笛から敵へ光の粒が流れる（息で攻撃している演出）
   const attacking = screen === "play" && player && player.state === "playing";
-  setStream(attacking ? level : 0, document.querySelector(".flute .mouth"), player?.battle.target);
+  setStream(attacking ? level : 0, player?.battle.origin, player?.battle.target);
   player?.battle.setBreath(attacking ? level : 0);
 }
 
@@ -80,7 +96,8 @@ class Player {
     this.results = [];
     this.combo = 0;
     this.resetPhraseStats();
-    this.battle = new Battle($("battle"), id);
+    this.battle = new Battle($("battle"), currentStage(), me);
+    this.recent = [];
     this.renderPhrase();
   }
 
@@ -101,7 +118,20 @@ class Player {
     }
   }
 
+  // 呼吸の調子：直近2回の吐く息の長さと安定度から決める
+  updateStatus(ev) {
+    if (typeof ev?.duration !== "number" || typeof ev?.stability !== "number") return;
+    this.recent = [...this.recent, ev].slice(-2);
+    const avg = (k) => this.recent.reduce((s, e) => s + e[k], 0) / this.recent.length;
+    const len = Math.min(1, avg("duration") / 6);
+    const calm = Math.min(1, avg("stability"));
+    const score = (len + calm) / 2;
+    const mood = score >= 0.8 ? "great" : score >= 0.62 ? "good" : score >= 0.45 ? "normal" : "rough";
+    this.battle.setStatus({ len, calm, mood });
+  }
+
   exhaleEnd(ev) {
+    this.updateStatus(ev);
     if (this.state === "playing") {
       this.stopNote();
       this.phraseBreaths.push(ev);
@@ -232,7 +262,8 @@ let waitRelease = false; // 「吹いて開始」した直後の息は演奏に�
 function start(byBreath) {
   ensureAudio();
   player = new Player(songId, diffKey);
-  $("songTitle").textContent = `${player.song.title}（${diffKey}）`;
+  const st = currentStage();
+  $("songTitle").textContent = `STAGE ${st.no}  ${st.name}（${player.song.title}・${diffKey}）`;
   waitRelease = byBreath;
   prompt("まず、ゆっくり吸って…", "inhale");
   show("play");
@@ -242,7 +273,7 @@ function start(byBreath) {
 
 function finish(completed) {
   if (player && player.state !== "done") player.stop();
-  send({ type: "session_end", completed });
+  send({ type: "session_end", completed, game: completed && player ? { difficulty: diffKey, tiers: player.results.map((r) => r.tier) } : null });
   if (completed) {
     prompt("おつかれさまでした", "exhale");
   } else {
@@ -256,6 +287,7 @@ function showResult(r) {
   stopTrace();
   renderPhraseCharts(r.exhales || []);
   renderGameResult(player?.summary());
+  renderGrowth(r.growth);
   player = null;
   show("result");
   showReview(r, trace);
@@ -291,6 +323,66 @@ function renderGameResult(s) {
     .filter(([tier, n]) => n || tier !== "GREAT")
     .map(([tier, n]) => `<span class="${tier.toLowerCase()}">${tier} ${n}</span>`).join("");
   $("lowerBtn").hidden = diffKey === DIFFICULTY_ORDER[0];
+}
+
+// ---------- 経験値とレベルアップ（続ける理由） ----------
+async function renderGrowth(g) {
+  const box = $("growth");
+  if (!g) { box.hidden = true; return; }
+  box.hidden = false;
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const lvUp = g.after.level > g.before.level;
+  $("growthAvatar").innerHTML = avatarSVG(g.before.level, "good");
+  $("growthAvatar").classList.remove("evolve");
+  $("growthGain").innerHTML = `けいけんち <b>${g.gained}</b> ポイント かくとく！`;
+  $("growthLevel").textContent = `Lv ${g.before.level}`;
+  $("growthLines").innerHTML = "";
+  $("growthStage").textContent = "";
+  const bar = $("growthExp");
+  bar.style.transition = "none";
+  bar.style.width = `${(g.before.exp / g.before.next) * 100}%`;
+  $("growthNext").textContent = "";
+
+  await sleep(3200); // ふりかえりの演出のあとに出す
+  for (const line of g.lines) {
+    const li = document.createElement("li");
+    li.className = "pop";
+    li.innerHTML = `<span>${line.label}</span><b>+${line.value}</b>`;
+    $("growthLines").append(li);
+    await sleep(220);
+  }
+  if (g.rate !== 1) {
+    const li = document.createElement("li");
+    li.className = "pop rate";
+    li.innerHTML = `<span>なんいど ボーナス</span><b>×${g.rate}</b>`;
+    $("growthLines").append(li);
+  }
+  await sleep(300);
+  bar.style.transition = "width 1.2s ease";
+  if (lvUp) {
+    bar.style.width = "100%";
+    await sleep(1300);
+    levelUpSfx();
+    $("growthLevel").innerHTML = `<span class="lvup">レベルが あがった！</span> Lv ${g.before.level} → <b>Lv ${g.after.level}</b>`;
+    $("growthAvatar").innerHTML = avatarSVG(g.after.level, "great");
+    $("growthAvatar").classList.add("evolve");
+    const gear = [];
+    for (let lv = g.before.level + 1; lv <= g.after.level; lv++) if (newGearAt(lv)) gear.push(newGearAt(lv));
+    if (gear.length) $("growthLevel").innerHTML += `<br>${gear.join("・")}を てにいれた！（${titleFor(g.after.level)}）`;
+    confetti(160);
+    bar.style.transition = "none";
+    bar.style.width = "0%";
+    await sleep(60);
+    bar.style.transition = "width 1s ease";
+  }
+  bar.style.width = `${(g.after.exp / g.after.next) * 100}%`;
+  $("growthNext").textContent = `つぎの レベルまで あと ${g.after.next - g.after.exp}`;
+  const nextStage = STAGES.find((s) => s.rec > g.after.level) || null;
+  $("growthStage").textContent = nextStage
+    ? `つぎの もくひょう：STAGE ${nextStage.no} ${nextStage.name}（すいしょう Lv ${nextStage.rec}）`
+    : "すべての ステージの すいしょうレベルに とうたつ！";
+  me = g.after;
+  renderMe();
 }
 
 // ---------- グラフ ----------
@@ -354,6 +446,7 @@ let ws;
 function send(msg) { if (ws?.readyState === 1) ws.send(JSON.stringify(msg)); }
 function connect() {
   ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onopen = () => send({ type: "get_profile" });
   ws.onclose = () => { setSensor("サーバー未接続", false); setTimeout(connect, 2000); };
   ws.onmessage = (e) => {
     const m = JSON.parse(e.data);
@@ -364,6 +457,7 @@ function connect() {
     } else if (m.type === "touch" && m.source === "board") setHoles(m.holes);
     else if (m.type === "session_result") showResult(m);
     else if (m.type === "history") renderHistory(m);
+    else if (m.type === "profile") { me = m; renderMe(); }
     else if (m.type === "status") setSensor(m.mock ? "センサー：疑似データ" : m.dps ? "センサー：接続中" : "センサー：未接続", m.dps);
   };
 }
@@ -401,7 +495,7 @@ addEventListener("keyup", (e) => {
     clearInterval(spaceTimer);
     if (screen === "play" && !waitRelease) send({ type: "breath_key", duration: (performance.now() - spaceStart) / 1000 });
     onBreathSample({ state: "idle", delta: 0 });
-    onExhaleEnd({ stability: 0.8, source: "keyboard" });
+    onExhaleEnd({ stability: 0.8, duration: (performance.now() - spaceStart) / 1000, source: "keyboard" });
   }
   const i = "1234".indexOf(e.key);
   if (i >= 0) setHoles(holes.map((v, j) => (j === i ? 0 : v)));
@@ -420,5 +514,5 @@ $("recordsBtn").onclick = showRecords;
 $("homeRecordsBtn").onclick = showRecords;
 $("recordsHomeBtn").onclick = () => show("home");
 
-renderSongs();
+renderMe();
 connect();
