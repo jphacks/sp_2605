@@ -34,7 +34,9 @@
 | H03 | [x] | KatoRyunosuke | **USB ケーブルの確認**：コネクタの形（Type-C / Micro-B）と本数を書く。ボードをPCに挿して、**ボードのLEDが点くか**と、PCで「デバイスを接続した音」が鳴るかを書く | 結果：10/17 KatoRyunosuke：付属ケーブルは **USB-A ⇔ Micro-B が1本だけ**（DPS368 2GO / PSoC6 用）。**PSOC 4100T Plus 用の Type-C ケーブルは付いていない** → C to C ケーブルを用意済み。DPS368 2GO（Micro-B）・PSOC 4100T Plus（Type-C）ともに PC に挿すと **LED 点灯**を確認。接続音は未記録 |
 | H04 | [x] | KatoRyunosuke | **PSOC 4100T Plus の認識確認**：USB で挿して、PowerShell で次を実行し出力を貼る：`Get-PnpDevice -PresentOnly \| Where-Object FriendlyName -match 'KitProg\|COM\|CMSIS'`。「KitProg3」や「USB シリアル デバイス (COMx)」が出ればOK。※ Hi6to のPCの **COM6・COM7 は Bluetooth なのでボードではない** | 結果：10/17 KatoRyunosuke（Kato のPC）：OK。`KitProg3 USB-UART (COM3)` / `KitProg3 bridge` / `KitProg3 CMSIS-DAP` が出た。スクショ `reports/boards/H04_PSOC4100TPlus_認識_KatoPC.png`。※COM番号は PC ごとに変わる |
 | H05 | [x] | KatoRyunosuke | **DPS368 側のボードの認識確認**：H02 が (a) か (c) なら、そのボードを挿して H04 と同じコマンドを実行し出力を貼る。(b) の場合はスキップして「(b) のためスキップ」と書く | 結果：10/17 KatoRyunosuke（Kato のPC）：OK（H02 は (a)）。DPS368 2GO を単体で挿すと `USB シリアル デバイス (COM4)` が出た（KitProg は出ない）。スクショ `reports/boards/H05_DPS368_2GO_認識_KatoPC.png`。※COM番号は PC ごとに変わる |
-| H06 | [ ] | Hi6to | **2枚同時接続**：両方のボードを挿して H04 のコマンドを実行し、COM ポートが2つ出るか確認。どのCOM番号がどのボードか書く | 結果： |
+| H06a | [ ] | 誰でも | **2枚同時接続（自分のPCで先行確認）**：①何も挿さずに H04 のコマンドを実行して出力をメモ → ② PSOC 4100T Plus（Type-C）だけ挿して実行 → ③ そのまま DPS368 2GO（Micro-B）も挿して実行。③で `KitProg3 USB-UART (COMx)` と `USB シリアル デバイス (COMy)` の**両方が同時に出るか**、それぞれの番号を書く。片方が消える場合は USB ハブをやめて PC に直接挿して再確認 | 結果： |
+| H06b | [ ] | 誰でも | **DPS368 2GO の最初からの出力を読む（読むだけ。ボードの中身は変えない）**：DPS368 2GO を挿した状態で、PowerShell で `py -m pip install pyserial` → `py -c "import serial,time;s=serial.Serial('COM4',115200,timeout=1);time.sleep(5);print(s.read(500))"`（COM4 は H06a で出た番号に置き換える）。出力をそのまま貼る。`b''`（空）なら「何も出ない」と書く | 結果： |
+| H06 | [ ] | Hi6to | **2枚同時接続（本番のPC）**：H06a と同じ手順を Hi6to のPCで行う。1枚挿すごとに Claude に声をかけ、COM番号の確認と DPS368 2GO の出力の読み取りを Claude が行う | 結果： |
 
 ## 2. 動作確認（サンプルの書き込みは Hi6to のPCで、触る・吹く確認は誰でも）
 
