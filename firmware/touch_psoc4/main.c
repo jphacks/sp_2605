@@ -23,7 +23,7 @@
  * User configurable Macros
  ********************************************************************************/
 /* エア・オカリナ：指穴4つの状態を KitProg3 の USB-UART（115200bps）へ「T:0101」の形で送る。
- * 指穴1 = CSD ボタン、指穴2 = CSX ボタン、指穴3・4 = ISX ボタン1・2。
+ * 指穴1 = CSD ボタン、指穴2 = CSX ボタン、指穴3・4 = 外付け電極（予定。今は常に 0）。
  * 状態が変わった時と、変わらなくても約0.2秒ごとに送る（PC側がつなぎ直しても状態がわかるように）。 */
 #define UART_CLK_DIV_NUM                (2u)   /* 16bit 分周器 0・1 は CAPSENSE 側が使用中 */
 #define UART_CLK_DIV_VALUE              (51u)  /* 48MHz / 52 / oversample 8 ≒ 115200bps */
@@ -170,21 +170,22 @@ static void initialize_uart(void)
  *******************************************************************************/
 static void report_touch(void)
 {
-    static const uint32_t widgets[4] =
+    /* 基板上で使えるのは CSD・CSX の2ボタンだけ（ISX はコイルが無いと誤反応するので使わない）。
+     * 指穴3・4は外付け電極に切り替えるまで常に 0 を送る。 */
+    static const uint32_t widgets[2] =
     {
         CY_CAPSENSE_CSD_BUTTON_WDGT_ID,
         CY_CAPSENSE_CSX_BUTTON_WDGT_ID,
-        CY_CAPSENSE_ISX_BUTTON1_WDGT_ID,
-        CY_CAPSENSE_ISX_BUTTON2_WDGT_ID,
     };
-    static char last[4] = { 'x', 'x', 'x', 'x' };
+    static char last[2] = { 'x', 'x' };
     static uint32_t count = 0u;
     char line[] = "T:0000\r\n";
     bool changed = false;
 
-    for (uint32_t i = 0u; i < 4u; i++)
+    for (uint32_t i = 0u; i < 2u; i++)
     {
-        char c = (CAPSENSE_WIDGET_INACTIVE != Cy_CapSense_IsWidgetActive(widgets[i], &cy_capsense_context)) ? '1' : '0';
+        /* Cy_CapSense_IsWidgetActive は触れている時に 0 以外を返す */
+        char c = (0u != Cy_CapSense_IsWidgetActive(widgets[i], &cy_capsense_context)) ? '1' : '0';
         line[2u + i] = c;
         if (c != last[i])
         {
