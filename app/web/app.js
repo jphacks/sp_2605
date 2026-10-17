@@ -11,7 +11,6 @@ const $ = (id) => document.getElementById(id);
 // 観戦モード（?watch=1）：別のPCの演奏をそのまま映す。操作できず、記録も保存しない
 const WATCH = new URLSearchParams(location.search).has("watch");
 const MAX_HOLD_SEC = 6; // フレーズの最後の音を伸ばせる上限
-const SOLFA = { C: "ド", D: "レ", E: "ミ", F: "ファ", G: "ソ", A: "ラ", B: "シ" };
 
 // ---------- 画面 ----------
 function show(id) {
@@ -235,14 +234,15 @@ class Player {
     $("phraseDots").innerHTML = this.song.phrases
       .map((_, i) => `<i class="${i < this.phrase ? "done" : i === this.phrase ? "now" : ""}"></i>`)
       .join("");
-    // リズムの目印：音の名前（ドレミ）入りの大きな丸
-    $("noteRow").innerHTML = this.notes.map(([n]) => `<i>${SOLFA[n[0]]}</i>`).join("");
+    // リズムの目印：押す指穴の番号（1〜4）入りの大きな丸。色も笛の穴と同じにする
+    $("noteRow").innerHTML = this.notes.map(([n]) => { const h = holeFor(n) + 1; return `<i class="h${h}">${h}</i>`; }).join("");
     this.renderNote(true);
   }
 
   renderNote(beforeStart = false) {
     [...$("noteRow").children].forEach((el, i) => {
-      el.className = i < this.note ? "played" : i === this.note && !beforeStart ? "now" : "";
+      el.classList.toggle("played", i < this.note);
+      el.classList.toggle("now", i === this.note && !beforeStart);
     });
     const hole = holeFor(this.notes[this.note][0]);
     document.querySelectorAll("#holes span").forEach((el, i) => {

@@ -583,3 +583,20 @@ button { font: inherit; cursor: pointer; }
 .watch-bar { position: sticky; top: 0; z-index: 60; background: #0d1430; color: #ffd166; text-align: center; padding: 6px 12px; font-family: "DotGothic16", system-ui, sans-serif; font-size: 14px; }
 body.watch main { pointer-events: none; }
 body.watch .devbar { display: none; }
+
+/* 指穴ごとの色と番号：リズムの目印と笛の穴を同じ色・同じ番号にして、どの穴を押すか一目で分かるようにする */
+:root { --h1: #ff7a7a; --h2: #ffc857; --h3: #6fdc8c; --h4: #6cb6ff; }
+.h1 { --hc: var(--h1); } .h2 { --hc: var(--h2); } .h3 { --hc: var(--h3); } .h4 { --hc: var(--h4); }
+.holes span {
+  display: grid; place-items: center; font-family: "DotGothic16", system-ui, sans-serif;
+  font-size: 22px; font-weight: bold; color: var(--hc); border: 3px solid var(--hc);
+}
+.holes span.pressed { background: var(--hc); color: #2a190b; }
+.holes span.next { box-shadow: 0 0 0 4px var(--hc), 0 0 26px 8px var(--hc); }
+.holes span.hit { background: var(--hc); color: #2a190b; }
+.msg-win .note-row i { font-size: 18px; font-weight: bold; color: var(--hc); border-color: var(--hc); }
+.msg-win .note-row i.played { background: #2c355a; color: var(--hc); border-color: var(--hc); opacity: 0.4; }
+.msg-win .note-row i.now {
+  background: var(--hc); color: #0d1430; border-color: #fff;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.25), 0 0 18px var(--hc);
+}
