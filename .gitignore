@@ -1,0 +1,27 @@
+# ModusToolbox
+build/
+mtb_shared/
+*.hex
+*.elf
+
+# Arduino
+*.bin
+
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+
+# secrets
+.env
+
+# app data (real play records)
+app/data/sessions.jsonl
+app/data/raw/
+app/data/profile.json
+app/data/records.jsonl
