@@ -5,14 +5,15 @@ import statistics
 from dataclasses import dataclass, field
 
 # H12（コンビニ袋で密閉）の実測：静止ぶれ 0.4Pa、弱く +122Pa、強く +312Pa、吸う -30Pa
-EXHALE_ON = 15.0
-EXHALE_OFF = 8.0
-INHALE_ON = -12.0
-INHALE_OFF = -6.0
+# 1回目の試奏で、袋に触れた時などの小さな気圧変化を息と誤検知したため、しきい値を高めにしている
+EXHALE_ON = 30.0
+EXHALE_OFF = 15.0
+INHALE_ON = -25.0
+INHALE_OFF = -10.0
 STRENGTH_FULL = 300.0  # この変化量で strength = 1
 BASELINE_WARMUP = 5  # 起動直後、この数のサンプルの中央値を基準値にする
-BASELINE_FOLLOW = 0.05  # idle 中の基準値の追従の速さ（0〜1）
-BASELINE_FOLLOW_BAND = 5.0  # 基準値から ±この範囲の時だけ追従する
+BASELINE_FOLLOW = 0.1  # idle 中の基準値の追従の速さ（0〜1）
+BASELINE_FOLLOW_BAND = 10.0  # 基準値から ±この範囲の時だけ追従する（袋がゆっくりしぼむ等を吸収）
 # 袋に入れ直した時などに基準値がずれて「吐きっぱなし」になるのを防ぐ：
 # この秒数以上、変化がほぼ一定のまま吐く/吸う状態が続いたら基準値を測り直す
 STUCK_SEC = 12.0

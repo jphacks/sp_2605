@@ -22,3 +22,4 @@ Thumbs.db
 
 # app data (real play records)
 app/data/sessions.jsonl
+app/data/raw/

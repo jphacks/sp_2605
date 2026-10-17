@@ -12,6 +12,7 @@ import argparse
 import asyncio
 import json
 import mimetypes
+from datetime import datetime
 from http import HTTPStatus
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from breath import BreathDetector
 from serial_io import SerialReader, mock_pressure, parse_pressure, parse_touch
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+RAW_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
 
 clients = set()
 status = {"dps": False, "touch": False, "mock": False}
@@ -73,13 +75,20 @@ async def handler(ws):
 
 
 async def pump(queue: asyncio.Queue) -> None:
-    """ボードからの値を判定してブラウザへ流す。"""
+    """ボードからの値を判定してブラウザへ流す。生データは app/data/raw/ に CSV で残す（調整用）。"""
     detector = BreathDetector()
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    raw = (RAW_DIR / f"{datetime.now():%Y%m%d-%H%M%S}.csv").open("w", encoding="utf-8")
+    raw.write("t_sec,pa,delta,state,event\n")
     while True:
         item = await queue.get()
         if item[0] == "pressure":
             _, t, pa = item
             msg, events = detector.update(t, pa)
+            if msg:
+                names = ";".join(e["event"] for e in events)
+                raw.write(f"{t:.3f},{pa:.2f},{msg['delta']},{msg['state']},{names}\n")
+                raw.flush()
             if msg:
                 send_all(msg)
             for ev in events:
