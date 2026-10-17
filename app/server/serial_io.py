@@ -15,11 +15,28 @@ import threading
 import time
 
 import serial
+from serial.tools import list_ports
 
 # 既存FW：「Pressure[Pascal]:102218.73」。自作FW用に「P:102218.73」や数値だけの行も受け付ける
 PRESSURE_RE = re.compile(r"(?:Pressure\[Pascal\]:|P:)?\s*(-?\d+(?:\.\d+)?)\s*$")
 # タッチ：「T:0101」（左から指穴1〜4）
 TOUCH_RE = re.compile(r"T:([01]{4})")
+
+
+# ボードを USB の識別番号で見分ける（COM の番号は PC ごとに変わるため）
+BOARD_IDS = {
+    "dps": [(0x1366, None)],     # DPS368 2GO：基板上の J-Link（SEGGER）の USB シリアル
+    "touch": [(0x04B4, 0xF155)],  # PSOC 4100T Plus：KitProg3 の USB-UART
+}
+
+
+def find_port(name: str) -> str | None:
+    """ボードがつながっている COM ポートを探す。見つからなければ None。"""
+    for p in list_ports.comports():
+        for vid, pid in BOARD_IDS.get(name, []):
+            if p.vid == vid and (pid is None or p.pid == pid):
+                return p.device
+    return None
 
 
 class SerialReader(threading.Thread):
@@ -36,8 +53,15 @@ class SerialReader(threading.Thread):
     def run(self):
         t0 = time.monotonic()
         while True:
+            # "auto" のときは、つなぐたびにボードを探し直す（あとから挿しても動く）
+            port = find_port(self.name) if self.port == "auto" else self.port
+            if not port:
+                self._put(("status", self.name, False))
+                time.sleep(2)
+                continue
             try:
-                with serial.Serial(self.port, self.baud, timeout=1) as s:
+                with serial.Serial(port, self.baud, timeout=1) as s:
+                    print(f"[{self.name}] {port} に接続しました", flush=True)
                     self._put(("status", self.name, True))
                     s.reset_input_buffer()
                     while True:

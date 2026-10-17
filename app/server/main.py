@@ -1,6 +1,6 @@
 """エア・オカリナのサーバー。
 
-    py app/server/main.py                 # ボード（DPS368=COM4, タッチ=COM3）を使う
+    py app/server/main.py                 # ボードを使う（COM ポートは自動で探す）
     py app/server/main.py --mock          # ボードなしで疑似の息を流す
     py app/server/main.py --dps COM5 --touch none
 
@@ -114,9 +114,9 @@ async def pump(queue: asyncio.Queue) -> None:
 
 async def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dps", default="COM4", help="DPS368 2GO の COM ポート")
+    ap.add_argument("--dps", default="auto", help="DPS368 2GO の COM ポート（auto で自動検出）")
     ap.add_argument("--dps-baud", type=int, default=9600)
-    ap.add_argument("--touch", default="COM3", help="PSOC 4100T Plus の COM ポート（none で使わない）")
+    ap.add_argument("--touch", default="auto", help="PSOC 4100T Plus の COM ポート（auto で自動検出、none で使わない）")
     ap.add_argument("--touch-baud", type=int, default=115200)
     ap.add_argument("--mock", action="store_true", help="ボードなしで疑似の息を流す")
     ap.add_argument("--port", type=int, default=8000)

@@ -11,6 +11,13 @@ JPHACKS2026 のチーム作業リポジトリ。作品は「エア・オカリ�
   - 写真・ログを `reports/` に追加する
 - ボードへの書き込みは、原則 Hi6to のPCで行う（他のPCで行う場合は TASKS.md に指示がある時だけ）
 
+## アプリを動かす（どのメンバーのPCでも）
+
+- **`docs/SETUP.md` を上から順に実行する。** Python とパッケージを入れて、`start.bat` か `py app/server/main.py` で起動する
+- ソフトのインストール（Python・`requirements.txt`）とアプリの起動は、どのPCで行ってもよい（ソースコードの変更ではないため）。インストールの前に本人に一言確認する
+- ボードの COM ポートは自動で探すので、指定しなくてよい
+- ボードへの書き込み（ModusToolbox・Arduino・J-Link）は Hi6to のPCだけで行う
+
 ## TASKS.md の更新方法
 
 1. 作業前に `git pull --rebase`

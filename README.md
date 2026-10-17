@@ -33,12 +33,16 @@
 - 最終提出は運営から配られる JPHACKS organization のリポジトリ（公開・MITライセンス）。このリポジトリは作業・進捗共有用
 - APIキーやパスワードはコミットしない
 
-## アプリの起動（Hi6to のPC）
+## アプリの起動（どのPCでも）
+
+**はじめて動かすPCでは [docs/SETUP.md](docs/SETUP.md) を見る**（Claude Code に「docs/SETUP.md を読んで、このPCで動かせるようにして」と頼めば、順に進めてくれる）。
 
 ```bash
-py app/server/main.py            # ボードを使う（DPS368=COM4, タッチ=COM3）
-py app/server/main.py --mock     # ボードなしで疑似の息を流す（誰のPCでも動く）
+py -m pip install -r requirements.txt   # 最初の1回
+py tools/check_env.py                   # 動かせるか確認（読むだけ）
+py app/server/main.py                   # 起動（ボードの COM ポートは自動で探す）
+py app/server/main.py --mock            # ボードなしで疑似の息を流す
 ```
 
-ブラウザで http://localhost:8000/ を開く。受信の確認は http://localhost:8000/debug.html（キーボードの 1〜4 で指穴を代用できる）。
-必要なもの：Python 3 と `py -m pip install pyserial websockets`
+Windows では `start.bat` のダブルクリックでも起動できる。ブラウザで http://localhost:8000/ を開き、画面を1回クリック。
+ボードが無いときは、スペースキー長押し＝吐く、1〜4キー＝指穴。
