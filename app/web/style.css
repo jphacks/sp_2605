@@ -93,6 +93,46 @@ button { font: inherit; cursor: pointer; }
 
 .devbar { text-align: center; font-size: 12px; color: var(--muted); padding: 8px; }
 
+/* ふりかえり（結果画面） */
+.headline { font-size: clamp(24px, 4.6vw, 36px); line-height: 1.4; }
+.headline .num { color: var(--accent); font-variant-numeric: tabular-nums; }
+.wave-card { width: 100%; margin: 4px 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px 10px; }
+.wave-card figcaption { font-size: 14px; font-weight: 600; text-align: left; color: var(--muted); }
+#wave { width: 100%; height: 150px; display: block; }
+#wave .wave-fill { fill: url(#waveGrad); opacity: 0.35; }
+#wave .wave-line { fill: none; stroke: url(#waveStroke); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+#wave .base { stroke: var(--line); stroke-width: 1; }
+.wave-axis { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+
+.judges { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; width: 100%; }
+.judge { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: left; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; }
+.judge .label { font-size: 13px; color: var(--muted); }
+.judge .value { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.judge .value small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 2px; }
+.judge .mark { grid-row: 1 / span 2; grid-column: 2; font-size: 30px; line-height: 1; }
+.judge .mark.good { color: var(--accent); }
+.judge .mark.ok { color: var(--glow); }
+.judge .mark.try { color: var(--muted); }
+.judge .hint { grid-column: 1 / span 2; font-size: 12px; color: var(--muted); }
+.criteria-note { align-self: center; font-size: 11px; }
+
+.tip { width: 100%; background: var(--accent-soft); border-radius: 14px; padding: 14px 18px; text-align: left; font-size: 15px; line-height: 1.6; }
+.tip b { color: var(--accent); }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 8px; }
+.badge { background: var(--surface); border: 2px solid var(--glow); border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 700; }
+.details { width: 100%; text-align: left; }
+.details summary { cursor: pointer; color: var(--muted); font-size: 14px; padding: 6px 0; }
+
+/* 動き：順番にふわっと出す */
+.reveal { opacity: 0; transform: translateY(14px); }
+.reveal.show { opacity: 1; transform: none; transition: opacity 0.6s ease, transform 0.6s ease; }
+.pop { animation: pop 0.5s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal.show { opacity: 1; transform: none; transition: none; }
+  .pop { animation: none; }
+}
+
 /* グラフ */
 .section-title { margin: 12px 0 0; font-size: 16px; color: var(--muted); font-weight: 600; align-self: flex-start; }
 .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; width: 100%; }

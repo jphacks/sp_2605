@@ -1,6 +1,7 @@
 import { SONGS, noteToFreq, holeFor } from "./songs.js";
 import { ensureAudio, setBreathLevel, Voice, sparkle } from "./audio.js";
 import { barChart, lineChart } from "./charts.js";
+import { showReview } from "./review.js";
 
 const $ = (id) => document.getElementById(id);
 const MAX_HOLD_SEC = 6; // フレーズの最後の音を伸ばせる上限
@@ -39,7 +40,20 @@ function onBreathSample(m) {
   const level = m.state === "exhale" ? Math.min(1, Math.max(0, m.delta / maxDelta)) : 0;
   setBreathLevel(level, $("followBreath").checked);
   $("meterFill").style.width = `${Math.round(level * 100)}%`;
+  breathLevel = level;
 }
+
+// ---------- 呼吸の波（結果画面用）：演奏中の息の強さを 0.1秒ごとに記録 ----------
+let breathLevel = 0;
+let trace = [];
+let traceTimer = null;
+function startTrace() {
+  trace = [];
+  const t0 = performance.now();
+  clearInterval(traceTimer);
+  traceTimer = setInterval(() => trace.push([(performance.now() - t0) / 1000, breathLevel]), 100);
+}
+function stopTrace() { clearInterval(traceTimer); traceTimer = null; }
 
 // ---------- 演奏の進行 ----------
 // ready: 吐くのを待つ / playing: 音が進む / paused: 途中で息が切れた / holding: 最後の音を伸ばしている / done
@@ -177,6 +191,7 @@ function start(byBreath) {
   prompt("まず、ゆっくり吸って…", "inhale");
   show("play");
   send({ type: "session_start", song: songId });
+  startTrace();
 }
 
 function finish(completed) {
@@ -185,23 +200,18 @@ function finish(completed) {
   if (completed) {
     prompt("おつかれさまでした", "exhale");
   } else {
+    stopTrace();
     player = null;
     show("home");
   }
 }
 
 function showResult(r) {
-  const hitRate = player && player.total ? `${player.hits}/${player.total}` : "-";
-  $("resultHeadline").textContent = r.exhale_count
-    ? `${r.exhale_count}回、ゆっくり息を吐けました`
-    : "おつかれさまでした";
-  $("rAvg").textContent = r.exhale_avg_sec.toFixed(1);
-  $("rMax").textContent = r.exhale_max_sec.toFixed(1);
-  $("rStab").textContent = `${Math.round(r.stability_avg * 100)}%`;
-  $("rHit").textContent = hitRate;
+  stopTrace();
   renderPhraseCharts(r.exhales || []);
   player = null;
   show("result");
+  showReview(r, trace);
 }
 
 // ---------- グラフ ----------
@@ -286,13 +296,21 @@ function setSensor(text, ok) {
 // ---------- キーボード（開発・デモの予備） ----------
 let spaceDown = false;
 let spaceStart = 0;
+let spaceTimer = null;
 addEventListener("keydown", (e) => {
   if (e.code === "Space" && !e.repeat) {
     e.preventDefault();
     spaceDown = true;
     spaceStart = performance.now();
     ensureAudio();
-    onBreathSample({ state: "exhale", delta: maxDelta * 0.6 });
+    // 本物の息に近い形（立ち上がって、少し揺れながら続く）にする
+    clearInterval(spaceTimer);
+    spaceTimer = setInterval(() => {
+      const t = (performance.now() - spaceStart) / 1000;
+      const level = Math.min(1, t / 0.5) * (0.55 + 0.03 * Math.sin(t * 1.5));
+      onBreathSample({ state: "exhale", delta: maxDelta * level });
+    }, 100);
+    onBreathSample({ state: "exhale", delta: maxDelta * 0.1 });
     onExhaleStart();
   }
   const i = "1234".indexOf(e.key);
@@ -301,6 +319,7 @@ addEventListener("keydown", (e) => {
 addEventListener("keyup", (e) => {
   if (e.code === "Space" && spaceDown) {
     spaceDown = false;
+    clearInterval(spaceTimer);
     if (screen === "play" && !waitRelease) send({ type: "breath_key", duration: (performance.now() - spaceStart) / 1000 });
     onBreathSample({ state: "idle", delta: 0 });
     onExhaleEnd();

@@ -39,9 +39,18 @@ class Session:
             # フレーズ（＝1回の吐く息）ごとの記録。「今回の1曲」のグラフに使う
             "exhales": [{"duration": round(e["duration"], 2), "stability": round(e["stability"], 3)} for e in ex],
         }
+        # 前回・自己ベストとの比較（今回を保存する前の記録と比べる）
+        past = [r for r in _read(SESSIONS) if r.get("exhale_count")]
+        if past:
+            result["prev"] = {"exhale_avg_sec": past[-1]["exhale_avg_sec"], "stability_avg": past[-1]["stability_avg"]}
+            result["best"] = {
+                "exhale_avg_sec": max(r["exhale_avg_sec"] for r in past),
+                "stability_avg": max(r["stability_avg"] for r in past),
+            }
         DATA_DIR.mkdir(exist_ok=True)
         with SESSIONS.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(result, ensure_ascii=False) + "\n")
+            saved = {k: v for k, v in result.items() if k not in ("prev", "best")}
+            f.write(json.dumps(saved, ensure_ascii=False) + "\n")
         return result
 
 

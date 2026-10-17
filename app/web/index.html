@@ -44,21 +44,32 @@
     </div>
   </section>
 
-  <!-- 結果（内容はチームで検討中の暫定版） -->
+  <!-- 結果：ふりかえり。課題①「正しくできているかわからない」②「続かない」に答える要素だけを並べる -->
   <section id="result" class="screen">
-    <p class="tag">暫定の結果画面</p>
-    <h2 id="resultHeadline"></h2>
-    <div class="stats">
-      <div><b id="rAvg">-</b><span>平均の吐く長さ（秒）</span></div>
-      <div><b id="rMax">-</b><span>いちばん長い息（秒）</span></div>
-      <div><b id="rStab">-</b><span>息の安定度</span></div>
-      <div><b id="rHit">-</b><span>指穴の正解</span></div>
-    </div>
-    <h3 class="section-title">今回の1曲：フレーズごとの息</h3>
-    <div class="charts">
-      <div id="cPhraseLen"></div>
-      <div id="cPhraseStab"></div>
-    </div>
+    <p class="tag">ふりかえり</p>
+    <h2 id="resultHeadline" class="headline"></h2>
+    <p id="resultSub" class="lead"></p>
+
+    <figure class="wave-card reveal">
+      <figcaption>あなたの呼吸の波</figcaption>
+      <svg id="wave" viewBox="0 0 600 160" preserveAspectRatio="none" role="img" aria-label="1曲分の息の強さの波"></svg>
+      <div class="wave-axis"><span>はじめ</span><span>おわり</span></div>
+    </figure>
+
+    <div id="judges" class="judges"></div>
+    <p class="note criteria-note">判定の基準は仮のものです（チームで調整中）</p>
+
+    <div id="tip" class="tip reveal"></div>
+    <div id="badges" class="badges"></div>
+
+    <details class="details">
+      <summary>くわしいデータ（フレーズごと）</summary>
+      <div class="charts">
+        <div id="cPhraseLen"></div>
+        <div id="cPhraseStab"></div>
+      </div>
+    </details>
+
     <div class="actions">
       <button id="againBtn" class="primary">もう1曲</button>
       <button id="recordsBtn" class="ghost">記録を見る</button>
