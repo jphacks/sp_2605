@@ -8,6 +8,8 @@ import { recordSVG, recordDiary, recordInsights, Replayer } from "./record.js";
 import { setStream, confetti } from "./fx.js";
 
 const $ = (id) => document.getElementById(id);
+// 観戦モード（?watch=1）：別のPCの演奏をそのまま映す。操作できず、記録も保存しない
+const WATCH = new URLSearchParams(location.search).has("watch");
 const MAX_HOLD_SEC = 6; // フレーズの最後の音を伸ばせる上限
 const SOLFA = { C: "ド", D: "レ", E: "ミ", F: "ファ", G: "ソ", A: "ラ", B: "シ" };
 
@@ -32,7 +34,7 @@ function renderSongs() {
     b.innerHTML = `<span class="stage-no">STAGE ${st.no}</span><b>${st.name}</b>
       <span class="stage-enemy">${st.enemy.name}</span>
       <span class="stage-rec ${me.level >= st.rec ? "ok" : ""}">すいしょう Lv ${st.rec}</span>`;
-    b.onclick = () => { songId = st.song; renderSongs(); };
+    b.onclick = () => act("song", { song: st.song });
     $("songs").append(b);
   }
 }
@@ -301,6 +303,7 @@ function finish(completed) {
 }
 
 function showResult(r) {
+  if (player && player.state !== "done") player.stop();
   stopTrace();
   renderPhraseCharts(r.exhales || []);
   renderGameResult(player?.summary());
@@ -319,7 +322,7 @@ function renderDifficulties() {
     const b = document.createElement("button");
     b.className = "diff" + (key === diffKey ? " selected" : "");
     b.innerHTML = `<b>${d.label}</b><span>${d.desc}</span>`;
-    b.onclick = () => { diffKey = key; start(false); };
+    b.onclick = () => act("start", { song: songId, diff: key, byBreath: false });
     $("diffs").append(b);
   }
 }
@@ -355,6 +358,7 @@ function renderNewRecord(rec) {
 }
 
 let replayer = null;
+let playReplay = () => {};
 function showShelf() {
   stopReplay();
   $("player").hidden = true;
@@ -370,7 +374,7 @@ function renderShelf(list) {
     const b = document.createElement("button");
     b.className = "shelf-item";
     b.innerHTML = `<div class="sleeve">${recordSVG(rec, { size: 140 })}</div><span class="diary">${recordDiary(rec)}</span>`;
-    b.onclick = () => openRecord(rec, list[list.indexOf(rec) + 1]);
+    b.onclick = () => act("record", { i: list.indexOf(rec) });
     $("shelfGrid").append(b);
   }
 }
@@ -384,7 +388,8 @@ function openRecord(rec, prev) {
   $("playerNext").innerHTML = ins.next ? `<b>つぎは：</b>${ins.next}` : "";
   $("playerProgress").style.width = "0%";
   $("player").scrollIntoView({ behavior: "smooth", block: "start" });
-  $("playerPlay").onclick = () => {
+  $("playerPlay").onclick = () => act("replay");
+  playReplay = () => {
     ensureAudio();
     stopReplay();
     const disc = $("playerDisc").querySelector("svg");
@@ -509,7 +514,10 @@ function showRecords() {
 
 // ---------- 息のイベント（サーバー or スペースキー） ----------
 function onExhaleStart() {
-  if (screen === "home") { start(true); return; }
+  if (screen === "home") {
+    if (!WATCH) act("start", { song: songId, diff: diffKey, byBreath: true }); // 観戦側は演奏側の合図で始める
+    return;
+  }
   if (screen === "play" && player && !waitRelease) player.exhaleStart();
 }
 function onExhaleEnd(ev = {}) {
@@ -520,7 +528,11 @@ function onExhaleEnd(ev = {}) {
 
 // ---------- サーバーとの通信 ----------
 let ws;
-function send(msg) { if (ws?.readyState === 1) ws.send(JSON.stringify(msg)); }
+const WATCH_BLOCK = new Set(["session_start", "session_end", "breath_key", "mirror"]);
+function send(msg) {
+  if (WATCH && WATCH_BLOCK.has(msg.type)) return;
+  if (ws?.readyState === 1) ws.send(JSON.stringify(msg));
+}
 function connect() {
   ws = new WebSocket(`ws://${location.host}/ws`);
   ws.onopen = () => send({ type: "get_profile" });
@@ -536,6 +548,7 @@ function connect() {
     else if (m.type === "history") renderHistory(m);
     else if (m.type === "profile") { me = m; renderMe(); }
     else if (m.type === "records") renderShelf(m.records);
+    else if (m.type === "mirror" && WATCH) ACTIONS[m.action]?.(m.data || {});
     else if (m.type === "status") setSensor(m.mock ? "センサー：疑似データ" : m.dps ? "センサー：接続中" : "センサー：未接続", m.dps);
   };
 }
@@ -548,53 +561,91 @@ function setSensor(text, ok) {
 let spaceDown = false;
 let spaceStart = 0;
 let spaceTimer = null;
+function spaceDownAct() {
+  spaceDown = true;
+  spaceStart = performance.now();
+  // 本物の息に近い形（立ち上がって、少し揺れながら続く）にする
+  clearInterval(spaceTimer);
+  spaceTimer = setInterval(() => {
+    const t = (performance.now() - spaceStart) / 1000;
+    const level = Math.min(1, t / 0.5) * (0.55 + 0.03 * Math.sin(t * 1.5));
+    onBreathSample({ state: "exhale", delta: maxDelta * level });
+  }, 100);
+  onBreathSample({ state: "exhale", delta: maxDelta * 0.1 });
+  onExhaleStart();
+}
+function spaceUpAct({ duration }) {
+  spaceDown = false;
+  clearInterval(spaceTimer);
+  if (screen === "play" && !waitRelease) send({ type: "breath_key", duration });
+  onBreathSample({ state: "idle", delta: 0 });
+  onExhaleEnd({ stability: 0.8, duration, source: "keyboard" });
+}
 addEventListener("keydown", (e) => {
+  if (WATCH) return;
   if (e.code === "Space" && !e.repeat) {
     e.preventDefault();
-    spaceDown = true;
-    spaceStart = performance.now();
     ensureAudio();
-    // 本物の息に近い形（立ち上がって、少し揺れながら続く）にする
-    clearInterval(spaceTimer);
-    spaceTimer = setInterval(() => {
-      const t = (performance.now() - spaceStart) / 1000;
-      const level = Math.min(1, t / 0.5) * (0.55 + 0.03 * Math.sin(t * 1.5));
-      onBreathSample({ state: "exhale", delta: maxDelta * level });
-    }, 100);
-    onBreathSample({ state: "exhale", delta: maxDelta * 0.1 });
-    onExhaleStart();
+    act("spaceDown");
   }
   const i = "1234".indexOf(e.key);
-  if (i >= 0 && !holes[i]) setHoles(holes.map((v, j) => (j === i ? 1 : v)));
+  if (i >= 0 && !holes[i]) act("holes", { holes: holes.map((v, j) => (j === i ? 1 : v)) });
 });
 addEventListener("keyup", (e) => {
-  if (e.code === "Space" && spaceDown) {
-    spaceDown = false;
-    clearInterval(spaceTimer);
-    if (screen === "play" && !waitRelease) send({ type: "breath_key", duration: (performance.now() - spaceStart) / 1000 });
-    onBreathSample({ state: "idle", delta: 0 });
-    onExhaleEnd({ stability: 0.8, duration: (performance.now() - spaceStart) / 1000, source: "keyboard" });
-  }
+  if (WATCH) return;
+  if (e.code === "Space" && spaceDown) act("spaceUp", { duration: (performance.now() - spaceStart) / 1000 });
   const i = "1234".indexOf(e.key);
-  if (i >= 0) setHoles(holes.map((v, j) => (j === i ? 0 : v)));
+  if (i >= 0) act("holes", { holes: holes.map((v, j) => (j === i ? 0 : v)) });
 });
+
+// ---------- 観戦モード：操作をその場で行い、同時に観戦画面へ流す ----------
+const ACTIONS = {
+  song: ({ song }) => { songId = song; renderSongs(); },
+  difficulty: () => showDifficulty(),
+  start: ({ song, diff, byBreath }) => { songId = song; diffKey = diff; start(byBreath); },
+  quit: () => finish(false),
+  again: () => start(false),
+  lower: () => { diffKey = DIFFICULTY_ORDER[Math.max(0, DIFFICULTY_ORDER.indexOf(diffKey) - 1)]; start(false); },
+  home: () => { stopReplay(); show("home"); },
+  shelf: () => showShelf(),
+  records: () => showRecords(),
+  record: ({ i }) => openRecord(shelfList[i], shelfList[i + 1]),
+  replay: () => { ensureAudio(); playReplay(); },
+  stopReplay: () => stopReplay(),
+  spaceDown: () => spaceDownAct(),
+  spaceUp: (d) => spaceUpAct(d),
+  holes: ({ holes: h }) => setHoles(h),
+};
+function act(action, data = {}) {
+  // 先に観戦画面へ流してから、自分で行う（最後の息 → 演奏の終わり、の順番が観戦側でも崩れないように）
+  if (!WATCH) send({ type: "mirror", action, data });
+  ACTIONS[action](data);
+}
+
+if (WATCH) {
+  document.body.classList.add("watch");
+  const bar = document.createElement("div");
+  bar.className = "watch-bar";
+  bar.textContent = "観戦モード：演奏している画面をそのまま映しています（画面を1回クリックすると音も出ます）";
+  document.body.prepend(bar);
+}
 
 // ブラウザはクリック等の操作があるまで音を出せないので、最初の1回の操作で音を有効にする
 addEventListener("pointerdown", ensureAudio, { once: true });
 
-$("startBtn").onclick = showDifficulty;
-$("homeShelfBtn").onclick = showShelf;
-$("toShelfBtn").onclick = showShelf;
-$("shelfHomeBtn").onclick = () => { stopReplay(); show("home"); };
-$("playerStop").onclick = stopReplay;
-$("diffBackBtn").onclick = () => show("home");
-$("lowerBtn").onclick = () => { diffKey = DIFFICULTY_ORDER[Math.max(0, DIFFICULTY_ORDER.indexOf(diffKey) - 1)]; start(false); };
-$("quitBtn").onclick = () => finish(false);
-$("againBtn").onclick = () => start(false);
-$("homeBtn").onclick = () => show("home");
-$("recordsBtn").onclick = showRecords;
-$("homeRecordsBtn").onclick = showRecords;
-$("recordsHomeBtn").onclick = () => show("home");
+$("startBtn").onclick = () => act("difficulty");
+$("homeShelfBtn").onclick = () => act("shelf");
+$("toShelfBtn").onclick = () => act("shelf");
+$("shelfHomeBtn").onclick = () => act("home");
+$("playerStop").onclick = () => act("stopReplay");
+$("diffBackBtn").onclick = () => act("home");
+$("lowerBtn").onclick = () => act("lower");
+$("quitBtn").onclick = () => act("quit");
+$("againBtn").onclick = () => act("again");
+$("homeBtn").onclick = () => act("home");
+$("recordsBtn").onclick = () => act("records");
+$("homeRecordsBtn").onclick = () => act("records");
+$("recordsHomeBtn").onclick = () => act("home");
 
 renderMe();
 connect();

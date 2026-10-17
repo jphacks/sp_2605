@@ -46,3 +46,5 @@ py app/server/main.py --mock            # ボードなしで疑似の息を流�
 
 Windows では `start.bat` のダブルクリックでも起動できる。ブラウザで http://localhost:8000/ を開き、画面を1回クリック。
 ボードが無いときは、スペースキー長押し＝吐く、1〜4キー＝指穴。
+
+デモで別のPC（プロジェクター）に演奏の画面を映すときは、演奏するPCで `share.bat`（または `py app/server/main.py --share`）を起動し、表示された観戦用のアドレス（`http://<IP>:8000/?watch=1`）を同じ Wi-Fi のPCで開く。手順は docs/SETUP_MANUAL.md の「デモの観戦」。

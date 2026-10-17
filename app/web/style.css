@@ -578,3 +578,8 @@ button { font: inherit; cursor: pointer; }
 /* hidden 属性を display の指定より優先する（空の箱が出ないように） */
 [hidden] { display: none !important; }
 .rec-rank { font-size: 18px; }
+
+/* ---- 観戦モード（?watch=1）：操作できないようにし、上に帯を出す ---- */
+.watch-bar { position: sticky; top: 0; z-index: 60; background: #0d1430; color: #ffd166; text-align: center; padding: 6px 12px; font-family: "DotGothic16", system-ui, sans-serif; font-size: 14px; }
+body.watch main { pointer-events: none; }
+body.watch .devbar { display: none; }

@@ -69,7 +69,10 @@ async def handler(ws):
         async for raw in ws:
             msg = json.loads(raw)
             kind = msg.get("type")
-            if kind == "session_start":
+            if kind == "mirror":
+                # 観戦モード：演奏している画面の操作を、ほかの画面（観戦）にそのまま流す
+                broadcast([c for c in clients if c is not ws], raw)
+            elif kind == "session_start":
                 session = store.Session(msg.get("song", "unknown"))
             elif kind == "session_end" and session is not None:
                 result = session.finish(bool(msg.get("completed")), msg.get("game"))
@@ -119,6 +122,24 @@ async def pump(queue: asyncio.Queue) -> None:
             send_all({"type": "status", **status})
 
 
+def lan_addresses() -> list[str]:
+    """このPCの、同じ Wi-Fi のほかのPCから見えるアドレス。"""
+    import socket
+    ips = set()
+    try:
+        ips.update(socket.gethostbyname_ex(socket.gethostname())[2])
+    except OSError:
+        pass
+    try:  # 実際に外へ出るときに使うアドレス（通信はしない）
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ips.add(s.getsockname()[0])
+        s.close()
+    except OSError:
+        pass
+    return sorted(ip for ip in ips if not ip.startswith("127."))
+
+
 async def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dps", default="auto", help="DPS368 2GO の COM ポート（auto で自動検出）")
@@ -127,6 +148,7 @@ async def main() -> None:
     ap.add_argument("--touch-baud", type=int, default=115200)
     ap.add_argument("--mock", action="store_true", help="ボードなしで疑似の息を流す")
     ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument("--share", action="store_true", help="同じ Wi-Fi のほかのPCから観戦できるようにする（デモ用）")
     args = ap.parse_args()
 
     loop = asyncio.get_running_loop()
@@ -140,8 +162,13 @@ async def main() -> None:
     if args.touch.lower() != "none" and not args.mock:
         SerialReader("touch", args.touch, args.touch_baud, parse_touch, loop, queue).start()
 
-    async with serve(handler, "localhost", args.port, process_request=serve_static):
-        print(f"open http://localhost:{args.port}/  (debug: /debug.html)")
+    host = "0.0.0.0" if args.share else "localhost"
+    async with serve(handler, host, args.port, process_request=serve_static):
+        print(f"open http://localhost:{args.port}/  (debug: /debug.html)", flush=True)
+        if args.share:
+            print("観戦用のアドレス（同じ Wi-Fi のPCのブラウザで開く）：", flush=True)
+            for ip in lan_addresses():
+                print(f"    http://{ip}:{args.port}/?watch=1", flush=True)
         await asyncio.Future()
 
 
