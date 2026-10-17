@@ -504,3 +504,34 @@ button { font: inherit; cursor: pointer; }
 .avatar-spot { width: 190px; height: 170px; }
 .enemy-spot { top: 1%; }
 @media (max-width: 560px) { .avatar { width: 115px; height: 115px; } }
+
+/* ---- オーラ：演奏の調子が良いほど強くなる（data-aura = 0〜3） ---- */
+.avatar-spot .aura { position: absolute; left: 50%; bottom: 0; width: 240px; height: 240px; margin-left: -120px; pointer-events: none; opacity: 0; transition: opacity 0.6s; }
+.avatar-spot .aura i { position: absolute; inset: 0; border-radius: 50%; }
+.avatar-spot[data-aura="1"] .aura, .avatar-spot[data-aura="2"] .aura, .avatar-spot[data-aura="3"] .aura { opacity: 1; }
+/* 1：やわらかい青緑の光 */
+.avatar-spot[data-aura="1"] .glow { background: radial-gradient(circle at 50% 62%, rgba(140, 240, 220, 0.75), rgba(140, 240, 220, 0) 58%); animation: auraPulse 1.6s ease-in-out infinite; }
+/* 2：金色の光＋回る光の筋 */
+.avatar-spot[data-aura="2"] .glow { background: radial-gradient(circle at 50% 62%, rgba(255, 214, 102, 0.9), rgba(255, 214, 102, 0) 60%); animation: auraPulse 1s ease-in-out infinite; }
+.avatar-spot[data-aura="2"] .rays, .avatar-spot[data-aura="3"] .rays {
+  inset: -20px; background: repeating-conic-gradient(from 0deg at 50% 60%, rgba(255, 230, 140, 0.55) 0deg 8deg, transparent 8deg 24deg);
+  -webkit-mask: radial-gradient(circle at 50% 60%, #000 20%, transparent 62%); mask: radial-gradient(circle at 50% 60%, #000 20%, transparent 62%);
+  animation: auraSpin 6s linear infinite;
+}
+/* 3：虹色の光の筋＋下から舞い上がる光 */
+.avatar-spot[data-aura="3"] .glow { background: radial-gradient(circle at 50% 62%, rgba(255, 255, 255, 0.95), rgba(255, 214, 102, 0.6) 30%, rgba(255, 214, 102, 0) 62%); animation: auraPulse 0.6s ease-in-out infinite; }
+.avatar-spot[data-aura="3"] .rays { background: repeating-conic-gradient(from 0deg at 50% 60%, #ff7a7a 0deg 7deg, transparent 7deg 15deg, #ffd166 15deg 22deg, transparent 22deg 30deg, #7ee0c8 30deg 37deg, transparent 37deg 45deg, #8fb3ff 45deg 52deg, transparent 52deg 60deg); opacity: 0.75; animation-duration: 3s; }
+.avatar-spot[data-aura="3"] .sparks {
+  background:
+    radial-gradient(circle, #fff 0 2px, transparent 3px) 20% 100% / 30px 30px,
+    radial-gradient(circle, #ffd166 0 2px, transparent 3px) 70% 100% / 40px 40px,
+    radial-gradient(circle, #8fd7ff 0 2px, transparent 3px) 45% 100% / 26px 26px;
+  border-radius: 0; animation: sparksUp 1.2s linear infinite;
+  -webkit-mask: linear-gradient(to top, transparent, #000 30%, #000 70%, transparent); mask: linear-gradient(to top, transparent, #000 30%, #000 70%, transparent);
+}
+.avatar-spot.aura-up .aura { animation: auraBurst 0.7s ease-out; }
+@keyframes auraPulse { 0%, 100% { transform: scale(0.92); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; } }
+@keyframes auraSpin { to { transform: rotate(360deg); } }
+@keyframes sparksUp { from { background-position-y: 100%, 100%, 100%; } to { background-position-y: 0%, -20%, -40%; } }
+@keyframes auraBurst { 0% { transform: scale(0.4); filter: brightness(2.5); } 60% { transform: scale(1.2); } 100% { transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .avatar-spot .aura i { animation: none !important; } }

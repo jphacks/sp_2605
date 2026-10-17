@@ -85,6 +85,7 @@ export class Battle {
         </div>
         <div class="avatar-spot">
           <div class="platform"></div>
+          <div class="aura"><i class="rays"></i><i class="glow"></i><i class="sparks"></i></div>
           <div class="avatar">${avatarSVG(me.level, "normal")}</div>
         </div>
         <div class="win status-win">
@@ -142,6 +143,19 @@ export class Battle {
       this.mood = mood;
       this.avatarEl.innerHTML = avatarSVG(this.me.level, mood);
     }
+    this.refreshAura();
+  }
+
+  // 演奏の調子が良いほどアバターのオーラが強くなる（0〜3）
+  //  1：調子「いいかんじ」／ 2：「ぜっこうちょう」または 3コンボ以上 ／ 3：「ぜっこうちょう」かつ 3コンボ以上
+  refreshAura() {
+    const combo = this.combo || 0;
+    let lv = this.mood === "great" ? 2 : this.mood === "good" ? 1 : 0;
+    if (combo >= 3) lv = this.mood === "great" ? 3 : Math.max(lv, 2);
+    const spot = this.root.querySelector(".avatar-spot");
+    if (lv > (this.auraLv || 0)) this.restart(spot, "aura-up");
+    this.auraLv = lv;
+    spot.dataset.aura = lv;
   }
 
   // 吹いている間、アバターは息を吹き、敵は「効いている」様子で震える
@@ -159,6 +173,8 @@ export class Battle {
 
   // 判定を表示してダメージを与える。この攻撃で倒したら true
   hit({ tier, damage }, combo) {
+    this.combo = combo;
+    this.refreshAura();
     this.banner.className = `judge-banner ${tier.toLowerCase()}`;
     this.banner.innerHTML = tier === "MISS" ? "MISS…" : `${tier}!`;
     this.restart(this.banner, "show");
