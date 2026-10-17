@@ -116,10 +116,35 @@ async def pump(queue: asyncio.Queue) -> None:
                     session.add_event(ev)
                 send_all(ev)
         elif item[0] == "touch":
-            send_all({"type": "touch", "holes": item[2], "source": "board"})
+            send_all({"type": "touch", "holes": reorder_holes(item[2]), "source": "board"})
         elif item[0] == "status":
             status[item[1]] = item[2]
             send_all({"type": "status", **status})
+
+
+HOLE_ORDER_FILE = Path(__file__).resolve().parent.parent / "hole_order.txt"
+hole_order = [1, 2, 3, 4]
+
+
+def load_hole_order(text: str | None) -> list[int]:
+    """「2,3,1,4」のような指定を読む。吹き手から見て左から順に、各電極が基板の何番の指穴（1〜4）につながっているか。"""
+    if text is None and HOLE_ORDER_FILE.exists():
+        lines = [l.strip() for l in HOLE_ORDER_FILE.read_text(encoding="utf-8").splitlines()]
+        text = next((l for l in lines if l and not l.startswith("#")), "")
+    if not text:
+        return [1, 2, 3, 4]
+    order = [int(x) for x in text.replace(" ", "").split(",") if x]
+    if sorted(order) != [1, 2, 3, 4]:
+        print(f"[touch] 指穴の並びの指定が正しくないので無視します：{text}（1〜4 を1回ずつ並べる）", flush=True)
+        return [1, 2, 3, 4]
+    return order
+
+
+def reorder_holes(raw: list[int]) -> list[int]:
+    """基板の指穴1〜4の状態を、画面の左から順（吹き手から見た電極の並び）に並べ替える。"""
+    if len(raw) != 4:
+        return raw
+    return [raw[n - 1] for n in hole_order]
 
 
 def lan_addresses() -> list[str]:
@@ -149,7 +174,14 @@ async def main() -> None:
     ap.add_argument("--mock", action="store_true", help="ボードなしで疑似の息を流す")
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--share", action="store_true", help="同じ Wi-Fi のほかのPCから観戦できるようにする（デモ用）")
+    ap.add_argument("--hole-order", default=None,
+                    help="電極の並び（吹き手から見て左から、基板の指穴番号）。例：2,3,1,4。省略時は app/hole_order.txt、無ければ 1,2,3,4")
     args = ap.parse_args()
+
+    global hole_order
+    hole_order = load_hole_order(args.hole_order)
+    if hole_order != [1, 2, 3, 4]:
+        print(f"[touch] 指穴の並び（左から）：{','.join(map(str, hole_order))}", flush=True)
 
     loop = asyncio.get_running_loop()
     queue: asyncio.Queue = asyncio.Queue()
