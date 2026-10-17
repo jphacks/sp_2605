@@ -258,6 +258,9 @@ addEventListener("keyup", (e) => {
   if (i >= 0) setHoles(holes.map((v, j) => (j === i ? 0 : v)));
 });
 
+// ブラウザはクリック等の操作があるまで音を出せないので、最初の1回の操作で音を有効にする
+addEventListener("pointerdown", ensureAudio, { once: true });
+
 $("startBtn").onclick = () => start(false);
 $("quitBtn").onclick = () => finish(false);
 $("againBtn").onclick = () => start(false);
