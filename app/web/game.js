@@ -29,8 +29,8 @@ export const GAME = {
 // ステージ（敵ごとに1つ）。背景・推奨レベルつき。ロックはせず、推奨レベルを表示するだけ（発表で好きなステージを選べるように）
 // 敵の見た目はメンバーが描いたイラストに差し替える予定。今は図形の仮のキャラ
 export const STAGES = [
-  { id: "meadow", no: 1, name: "ほしのそうげん", song: "twinkle", bg: "meadow", rec: 1, enemy: { name: "ほしスライム", color: "#6cc5b0" } },
-  { id: "volcano", no: 2, name: "よろこびのかざん", song: "joy", bg: "volcano", rec: 3, enemy: { name: "よろこびドラゴン", color: "#e6a04b" } },
+  { id: "meadow", no: 1, name: "ほしのそうげん", song: "twinkle", bg: "meadow", rec: 1, enemy: { name: "ほしスライム", color: "#8e7bff" } },
+  { id: "volcano", no: 2, name: "よろこびのかざん", song: "joy", bg: "volcano", rec: 3, enemy: { name: "よろこびドラゴン", color: "#ffcf3f" } },
 ];
 
 // フレーズ1つの判定

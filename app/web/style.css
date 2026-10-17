@@ -450,3 +450,57 @@ button { font: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .avatar, .avatar.blowing, .avatar.attack, .avatar.cheer, .av-aura, .growth-avatar.evolve { animation: none; }
 }
+
+/* ---- 調整：リズムの目印を大きく、敵を大きく・くっきり、オカリナのアバター ---- */
+.msg-win .note-row { gap: 8px; flex-wrap: wrap; }
+.msg-win .note-row i {
+  width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+  font-style: normal; font-size: 13px; color: #b9c3e6; background: #2c355a; border: 2px solid #3d4775;
+  transition: transform 0.15s, background 0.15s;
+}
+.msg-win .note-row i.played { background: #5cc2b3; color: #0d1430; border-color: #5cc2b3; }
+.msg-win .note-row i.now {
+  background: #ffd166; color: #0d1430; border-color: #fff; transform: scale(1.35);
+  box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.35), 0 0 18px #ffd166; animation: notePulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes notePulse { to { box-shadow: 0 0 0 8px rgba(255, 209, 102, 0.15), 0 0 26px #ffd166; } }
+
+.scene { height: 360px; }
+.enemy-spot { width: 260px; height: 200px; }
+.scene .enemy {
+  width: 210px; height: 162px;
+  border: 5px solid #1b1f3a;
+  box-shadow: inset 0 -16px 0 rgba(0, 0, 0, 0.18), inset 10px 10px 0 rgba(255, 255, 255, 0.25), 0 10px 0 rgba(0, 0, 0, 0.25);
+}
+.scene .enemy .eyes { top: 58px; gap: 44px; }
+.scene .enemy .eyes i { width: 22px; height: 30px; box-shadow: inset 4px 4px 0 #ffffff; }
+.scene .enemy .mouth { top: 104px; width: 34px; height: 14px; margin-left: -17px; }
+.enemy-spot .platform { width: 250px; height: 44px; margin-left: -125px; background: rgba(0, 0, 0, 0.28); }
+
+.av-body { fill: #f2c48d; stroke: #8a4f22; stroke-width: 3; }
+.av-hole { fill: #8a4f22; }
+.av-notes text { font-size: 18px; fill: #ffd166; stroke: #1b1f3a; stroke-width: 1; animation: noteFloat 2s ease-in-out infinite alternate; }
+.av-notes text:nth-child(2) { animation-delay: 0.6s; fill: #ff9fb0; }
+.av-notes text:nth-child(3) { animation-delay: 1.2s; fill: #8fd7ff; }
+@keyframes noteFloat { to { transform: translateY(-8px); } }
+.av-aura ellipse { fill: none; stroke: #ffd166; stroke-width: 1.2; opacity: 0.7; }
+.av-aura { animation: none; }
+@media (max-width: 560px) {
+  .scene { height: 320px; }
+  .enemy-spot { width: 190px; height: 150px; }
+  .scene .enemy { width: 150px; height: 116px; }
+  .scene .enemy .eyes { top: 40px; gap: 30px; }
+  .scene .enemy .mouth { top: 76px; }
+}
+
+/* オカリナを「青い釉薬の焼き物」に（クッキーに見えないように）・少し大きく */
+.av-body { fill: #4f9fe0; stroke: #1b3f73; stroke-width: 3; }
+.av-shine { stroke: #e6f4ff; stroke-width: 6; opacity: 0.85; }
+.av-hole { fill: #0d1c3a; stroke: #9fd0f5; stroke-width: 1.5; }
+.av-ink { fill: #0d1430; }
+.av-line { stroke: #0d1430; }
+.av-cheek { fill: #ff9fb0; opacity: 0.9; }
+.avatar { width: 160px; height: 160px; }
+.avatar-spot { width: 190px; height: 170px; }
+.enemy-spot { top: 1%; }
+@media (max-width: 560px) { .avatar { width: 115px; height: 115px; } }

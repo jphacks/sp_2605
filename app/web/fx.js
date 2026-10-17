@@ -4,6 +4,10 @@
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let canvas, ctx;
 const parts = [];
+const waves = [];
+let waveClock = 0;
+const NOTES = ["♪", "♫", "♬", "♩"];
+const NOTE_COLORS = ["#ffd166", "#ffffff", "#8fd7ff", "#ff9fb0", "#b8f2e6"];
 let stream = { level: 0, from: null, to: null };
 
 function ensure() {
@@ -33,16 +37,42 @@ function loop(now) {
   last = now;
   ctx.clearRect(0, 0, innerWidth, innerHeight);
 
-  // 息の流れ：吹いている間、笛から敵へ光の粒が流れる（息が強いほど多く太く）
+  // 音波の攻撃：吹いている間、オカリナから敵へ「音波の輪」と「音符」が飛ぶ（息が強いほど多く大きく）
   if (stream.level > 0.05 && stream.from && stream.to && !reduced) {
     const a = center(stream.from), b = center(stream.to);
-    const n = Math.ceil(stream.level * 4);
-    for (let i = 0; i < n; i++) {
-      const ang = Math.atan2(b.y - a.y, b.x - a.x) + (Math.random() - 0.5) * 0.5;
-      const sp = 520 + Math.random() * 260;
-      parts.push({ x: a.x + (Math.random() - 0.5) * 30, y: a.y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: 0.55, max: 0.55, size: 3 + stream.level * 6, color: Math.random() < 0.3 ? "#ffffff" : "#7fe0cf", glow: true, gravity: 0 });
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    const dist = Math.hypot(b.x - a.x, b.y - a.y);
+    waveClock += dt;
+    if (waveClock > 0.22 - stream.level * 0.1) {
+      waveClock = 0;
+      waves.push({ x: a.x, y: a.y, ang, r: 20, max: dist, w: 3 + stream.level * 5 });
+    }
+    if (Math.random() < 0.25 + stream.level * 0.5) {
+      const sp = 380 + Math.random() * 200;
+      const a2 = ang + (Math.random() - 0.5) * 0.35;
+      parts.push({
+        x: a.x, y: a.y, vx: Math.cos(a2) * sp, vy: Math.sin(a2) * sp,
+        life: dist / sp, max: dist / sp, size: 22 + stream.level * 20, gravity: 0, drag: 1,
+        color: NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)], glow: true,
+        note: NOTES[Math.floor(Math.random() * NOTES.length)], wobble: Math.random() * 6,
+      });
     }
   }
+  // 音波の輪（敵の方向に開いた弧が広がっていく）
+  for (let i = waves.length - 1; i >= 0; i--) {
+    const w = waves[i];
+    w.r += 520 * dt;
+    if (w.r > w.max) { waves.splice(i, 1); continue; }
+    ctx.globalAlpha = Math.max(0, 1 - w.r / w.max) * 0.9;
+    ctx.strokeStyle = "#ffffff";
+    ctx.shadowColor = "#8fd7ff";
+    ctx.shadowBlur = 14;
+    ctx.lineWidth = w.w;
+    ctx.beginPath();
+    ctx.arc(w.x, w.y, w.r, w.ang - 0.45, w.ang + 0.45);
+    ctx.stroke();
+  }
+  ctx.shadowBlur = 0;
 
   for (let i = parts.length - 1; i >= 0; i--) {
     const p = parts[i];
@@ -58,7 +88,18 @@ function loop(now) {
     ctx.globalAlpha = alpha;
     ctx.fillStyle = p.color;
     if (p.glow) { ctx.shadowColor = p.color; ctx.shadowBlur = 16; } else { ctx.shadowBlur = 0; }
-    if (p.rect) {
+    if (p.note) {
+      ctx.save();
+      ctx.translate(p.x, p.y + Math.sin((p.max - p.life) * 12 + p.wobble) * 6);
+      ctx.font = `bold ${p.size}px "Segoe UI Symbol", "Noto Music", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgba(13, 20, 48, 0.6)";
+      ctx.strokeText(p.note, 0, 0);
+      ctx.fillText(p.note, 0, 0);
+      ctx.restore();
+    } else if (p.rect) {
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
@@ -105,7 +146,9 @@ export function burst(el, { count = 40, colors = ["#ffd166"], speed = 520, size 
     parts.push({
       x: c.x, y: c.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 120,
       life: 0.7 + Math.random() * 0.6, max: 1.3, size: size * (0.6 + Math.random() * 0.8),
-      color: colors[i % colors.length], glow: true, star: stars && i % 2 === 0, gravity, drag: 0.97,
+      color: colors[i % colors.length], glow: true, star: stars && i % 3 === 0, gravity, drag: 0.97,
+      // 当たったときにも音符がはじける
+      ...(i % 3 === 1 ? { note: NOTES[i % NOTES.length], size: size * 3.5, wobble: Math.random() * 6 } : {}),
     });
   }
 }

@@ -8,6 +8,7 @@ import { setStream, confetti } from "./fx.js";
 
 const $ = (id) => document.getElementById(id);
 const MAX_HOLD_SEC = 6; // フレーズの最後の音を伸ばせる上限
+const SOLFA = { C: "ド", D: "レ", E: "ミ", F: "ファ", G: "ソ", A: "ラ", B: "シ" };
 
 // ---------- 画面 ----------
 function show(id) {
@@ -230,7 +231,8 @@ class Player {
     $("phraseDots").innerHTML = this.song.phrases
       .map((_, i) => `<i class="${i < this.phrase ? "done" : i === this.phrase ? "now" : ""}"></i>`)
       .join("");
-    $("noteRow").innerHTML = this.notes.map(() => "<i></i>").join("");
+    // リズムの目印：音の名前（ドレミ）入りの大きな丸
+    $("noteRow").innerHTML = this.notes.map(([n]) => `<i>${SOLFA[n[0]]}</i>`).join("");
     this.renderNote(true);
   }
 
