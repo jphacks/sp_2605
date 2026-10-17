@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 import growth
+import records
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 SESSIONS = DATA_DIR / "sessions.jsonl"
@@ -53,11 +54,13 @@ class Session:
         with SESSIONS.open("a", encoding="utf-8") as f:
             saved = {k: v for k, v in result.items() if k not in ("prev", "best")}
             if game:
-                saved["game"] = game
+                saved["game"] = {k: v for k, v in game.items() if k != "trace"}
             f.write(json.dumps(saved, ensure_ascii=False) + "\n")
         # 最後まで演奏したときだけ経験値をもらえる
         if completed and result["exhale_count"]:
             result["growth"] = growth.award(result, game)
+            if game and game.get("trace"):
+                result["record"] = records.add(result, game)
         return result
 
 

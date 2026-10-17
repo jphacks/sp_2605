@@ -31,7 +31,10 @@
     <div id="songs" class="stages"></div>
     <p class="hint breathe-hint">ストローを軽く吹いてはじめよう</p>
     <button id="startBtn" class="primary">はじめる</button>
-    <button id="homeRecordsBtn" class="ghost">記録を見る</button>
+    <div class="actions">
+      <button id="homeShelfBtn" class="ghost">レコード棚</button>
+      <button id="homeRecordsBtn" class="ghost">記録を見る</button>
+    </div>
   </section>
 
   <!-- 難易度の選択（ゲームの試作） -->
@@ -86,6 +89,12 @@
       <ul id="growthLines" class="growth-lines"></ul>
       <p id="growthStage" class="growth-stage"></p>
     </div>
+    <div id="newRecord" class="win new-record" hidden>
+      <p class="new-record-title">きょうの こきゅうが 1まいの レコードに なりました</p>
+      <div id="newRecordDisc" class="new-record-disc"></div>
+      <p id="newRecordDiary" class="diary"></p>
+      <button id="toShelfBtn" class="ghost">レコード棚を ひらく</button>
+    </div>
     <p class="tag">ふりかえり</p>
     <h2 id="resultHeadline" class="headline"></h2>
     <p id="resultSub" class="lead"></p>
@@ -116,6 +125,26 @@
       <button id="recordsBtn" class="ghost">記録を見る</button>
       <button id="homeBtn" class="ghost">ホームへ</button>
     </div>
+  </section>
+
+  <!-- 息のレコード棚：これまでの演奏が1枚ずつ並ぶ -->
+  <section id="shelf" class="screen">
+    <h2>息のレコード棚</h2>
+    <p class="lead">1回の演奏が1枚のレコードになります。タップすると、その日の演奏が流れます。</p>
+    <div id="player" class="win record-player" hidden>
+      <div id="playerDisc" class="player-disc"></div>
+      <div class="player-info">
+        <p id="playerDiary" class="diary"></p>
+        <div class="expbar"><i id="playerProgress"></i></div>
+        <div class="actions">
+          <button id="playerPlay" class="primary">さいせい</button>
+          <button id="playerStop" class="ghost">とめる</button>
+        </div>
+      </div>
+    </div>
+    <div id="shelfGrid" class="shelf-grid"></div>
+    <p id="shelfEmpty" class="lead" hidden>まだ レコードが ありません。1曲 さいごまで 吹くと 1まい できます。</p>
+    <button id="shelfHomeBtn" class="primary">ホームへ</button>
   </section>
 
   <!-- 記録 -->

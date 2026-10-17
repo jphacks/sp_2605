@@ -21,6 +21,7 @@ from websockets.datastructures import Headers
 from websockets.http11 import Response
 
 import growth
+import records
 import store
 from breath import BreathDetector
 from serial_io import SerialReader, mock_pressure, parse_pressure, parse_touch
@@ -67,6 +68,8 @@ async def handler(ws):
                 result = session.finish(bool(msg.get("completed")), msg.get("game"))
                 session = None
                 send_all({"type": "session_result", **result})
+            elif kind == "get_records":
+                await ws.send(json.dumps({"type": "records", "records": records.list_all()}, ensure_ascii=False))
             elif kind == "get_profile":
                 await ws.send(json.dumps({"type": "profile", **growth.public(growth.load())}, ensure_ascii=False))
             elif kind == "get_history":

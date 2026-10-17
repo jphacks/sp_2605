@@ -24,3 +24,4 @@ Thumbs.db
 app/data/sessions.jsonl
 app/data/raw/
 app/data/profile.json
+app/data/records.jsonl

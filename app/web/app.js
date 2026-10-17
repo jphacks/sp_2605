@@ -4,6 +4,7 @@ import { barChart, lineChart } from "./charts.js";
 import { showReview } from "./review.js";
 import { DIFFICULTIES, DIFFICULTY_ORDER, STAGES, Battle, judgePhrase, summarize } from "./game.js";
 import { avatarSVG, titleFor, newGearAt } from "./avatar.js";
+import { recordSVG, recordDiary, Replayer } from "./record.js";
 import { setStream, confetti } from "./fx.js";
 
 const $ = (id) => document.getElementById(id);
@@ -154,6 +155,7 @@ class Player {
 
   // このフレーズを判定して敵にダメージ
   judge(cut) {
+    this.auraMax = Math.max(this.auraMax || 0, this.battle.auraLv || 0);
     const stabs = this.phraseBreaths.map((b) => b?.stability).filter((s) => typeof s === "number");
     const stability = stabs.length ? stabs.reduce((a, b) => a + b, 0) / stabs.length : 0.6;
     const hitRatio = this.phraseTotal ? this.phraseHits / this.phraseTotal : 0;
@@ -275,7 +277,20 @@ function start(byBreath) {
 
 function finish(completed) {
   if (player && player.state !== "done") player.stop();
-  send({ type: "session_end", completed, game: completed && player ? { difficulty: diffKey, tiers: player.results.map((r) => r.tier) } : null });
+  let game = null;
+  if (completed && player) {
+    const s = player.summary();
+    game = {
+      difficulty: diffKey,
+      tiers: player.results.map((r) => r.tier),
+      stage: currentStage().id,
+      score: s.score,
+      defeated: s.defeated,
+      aura_max: Math.max(player.auraMax || 0, player.battle.auraLv || 0),
+      trace,
+    };
+  }
+  send({ type: "session_end", completed, game });
   if (completed) {
     prompt("おつかれさまでした", "exhale");
   } else {
@@ -290,6 +305,7 @@ function showResult(r) {
   renderPhraseCharts(r.exhales || []);
   renderGameResult(player?.summary());
   renderGrowth(r.growth);
+  renderNewRecord(r.record);
   player = null;
   show("result");
   showReview(r, trace);
@@ -325,6 +341,58 @@ function renderGameResult(s) {
     .filter(([tier, n]) => n || tier !== "GREAT")
     .map(([tier, n]) => `<span class="${tier.toLowerCase()}">${tier} ${n}</span>`).join("");
   $("lowerBtn").hidden = diffKey === DIFFICULTY_ORDER[0];
+}
+
+// ---------- 息のレコード ----------
+function renderNewRecord(rec) {
+  const box = $("newRecord");
+  if (!rec) { box.hidden = true; return; }
+  box.hidden = false;
+  $("newRecordDisc").innerHTML = recordSVG(rec, { size: 200, cls: "spin-in" });
+  $("newRecordDiary").textContent = recordDiary(rec);
+}
+
+let replayer = null;
+function showShelf() {
+  stopReplay();
+  $("player").hidden = true;
+  send({ type: "get_records" });
+  show("shelf");
+}
+function renderShelf(list) {
+  $("shelfEmpty").hidden = list.length > 0;
+  $("shelfGrid").innerHTML = "";
+  for (const rec of list) {
+    const b = document.createElement("button");
+    b.className = "shelf-item";
+    b.innerHTML = `<div class="sleeve">${recordSVG(rec, { size: 140 })}</div><span class="diary">${recordDiary(rec)}</span>`;
+    b.onclick = () => openRecord(rec);
+    $("shelfGrid").append(b);
+  }
+}
+function openRecord(rec) {
+  stopReplay();
+  $("player").hidden = false;
+  $("playerDisc").innerHTML = recordSVG(rec, { size: 220 });
+  $("playerDiary").textContent = recordDiary(rec);
+  $("playerProgress").style.width = "0%";
+  $("player").scrollIntoView({ behavior: "smooth", block: "start" });
+  $("playerPlay").onclick = () => {
+    ensureAudio();
+    stopReplay();
+    const disc = $("playerDisc").querySelector("svg");
+    disc.classList.add("spinning");
+    replayer = new Replayer(rec, {
+      onProgress: (p) => { $("playerProgress").style.width = `${Math.round(p * 100)}%`; },
+      onEnd: () => disc.classList.remove("spinning"),
+    });
+    replayer.play();
+  };
+}
+function stopReplay() {
+  replayer?.stop();
+  replayer = null;
+  $("playerDisc").querySelector("svg")?.classList.remove("spinning");
 }
 
 // ---------- 経験値とレベルアップ（続ける理由） ----------
@@ -460,6 +528,7 @@ function connect() {
     else if (m.type === "session_result") showResult(m);
     else if (m.type === "history") renderHistory(m);
     else if (m.type === "profile") { me = m; renderMe(); }
+    else if (m.type === "records") renderShelf(m.records);
     else if (m.type === "status") setSensor(m.mock ? "センサー：疑似データ" : m.dps ? "センサー：接続中" : "センサー：未接続", m.dps);
   };
 }
@@ -507,6 +576,10 @@ addEventListener("keyup", (e) => {
 addEventListener("pointerdown", ensureAudio, { once: true });
 
 $("startBtn").onclick = showDifficulty;
+$("homeShelfBtn").onclick = showShelf;
+$("toShelfBtn").onclick = showShelf;
+$("shelfHomeBtn").onclick = () => { stopReplay(); show("home"); };
+$("playerStop").onclick = stopReplay;
 $("diffBackBtn").onclick = () => show("home");
 $("lowerBtn").onclick = () => { diffKey = DIFFICULTY_ORDER[Math.max(0, DIFFICULTY_ORDER.indexOf(diffKey) - 1)]; start(false); };
 $("quitBtn").onclick = () => finish(false);

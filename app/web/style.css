@@ -535,3 +535,29 @@ button { font: inherit; cursor: pointer; }
 @keyframes sparksUp { from { background-position-y: 100%, 100%, 100%; } to { background-position-y: 0%, -20%, -40%; } }
 @keyframes auraBurst { 0% { transform: scale(0.4); filter: brightness(2.5); } 60% { transform: scale(1.2); } 100% { transform: none; filter: none; } }
 @media (prefers-reduced-motion: reduce) { .avatar-spot .aura i { animation: none !important; } }
+
+/* ---- 息のレコード ---- */
+.record { display: block; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35)); }
+.rec-label { font-family: "DotGothic16", system-ui, sans-serif; fill: #0d1430; }
+.rec-stage { font-size: 8px; }
+.rec-date { font-size: 11px; font-weight: 700; }
+.rec-score { font-size: 7px; }
+.record.spinning { animation: recSpin 1.8s linear infinite; }
+.record.spin-in { animation: recIn 1.4s cubic-bezier(.2,.9,.3,1); }
+@keyframes recSpin { to { transform: rotate(360deg); } }
+@keyframes recIn { from { transform: rotate(-540deg) scale(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.new-record { width: 100%; padding: 14px 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.new-record-title { margin: 0; font-size: 17px; color: #ffd166; }
+.diary { font-family: "DotGothic16", system-ui, sans-serif; font-size: 13px; margin: 0; }
+.new-record .diary, .record-player .diary { color: #b9c3e6; }
+
+.shelf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; width: 100%; }
+.shelf-item { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 8px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); }
+.shelf-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+.shelf-item .diary { font-size: 11px; color: var(--muted); }
+.sleeve { padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #2c355a, #0d1430); }
+
+.record-player { width: 100%; padding: 16px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.player-info { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 10px; }
+.record-player .expbar { height: 10px; }
