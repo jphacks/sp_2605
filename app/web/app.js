@@ -4,7 +4,7 @@ import { barChart, lineChart } from "./charts.js";
 import { showReview } from "./review.js";
 import { DIFFICULTIES, DIFFICULTY_ORDER, STAGES, Battle, judgePhrase, summarize } from "./game.js";
 import { avatarSVG, titleFor, newGearAt } from "./avatar.js";
-import { recordSVG, recordDiary, Replayer } from "./record.js";
+import { recordSVG, recordDiary, recordInsights, Replayer } from "./record.js";
 import { setStream, confetti } from "./fx.js";
 
 const $ = (id) => document.getElementById(id);
@@ -350,6 +350,8 @@ function renderNewRecord(rec) {
   box.hidden = false;
   $("newRecordDisc").innerHTML = recordSVG(rec, { size: 200, cls: "spin-in" });
   $("newRecordDiary").textContent = recordDiary(rec);
+  const ins = recordInsights(rec, null);
+  $("newRecordNext").innerHTML = ins.next ? `<b>つぎは：</b>${ins.next}` : "";
 }
 
 let replayer = null;
@@ -359,22 +361,27 @@ function showShelf() {
   send({ type: "get_records" });
   show("shelf");
 }
+let shelfList = [];
 function renderShelf(list) {
+  shelfList = list;
   $("shelfEmpty").hidden = list.length > 0;
   $("shelfGrid").innerHTML = "";
   for (const rec of list) {
     const b = document.createElement("button");
     b.className = "shelf-item";
     b.innerHTML = `<div class="sleeve">${recordSVG(rec, { size: 140 })}</div><span class="diary">${recordDiary(rec)}</span>`;
-    b.onclick = () => openRecord(rec);
+    b.onclick = () => openRecord(rec, list[list.indexOf(rec) + 1]);
     $("shelfGrid").append(b);
   }
 }
-function openRecord(rec) {
+function openRecord(rec, prev) {
   stopReplay();
   $("player").hidden = false;
-  $("playerDisc").innerHTML = recordSVG(rec, { size: 220 });
+  $("playerDisc").innerHTML = recordSVG(rec, { size: 240 });
   $("playerDiary").textContent = recordDiary(rec);
+  const ins = recordInsights(rec, prev);
+  $("playerFacts").innerHTML = ins.facts.map((f) => `<li>${f}</li>`).join("");
+  $("playerNext").innerHTML = ins.next ? `<b>つぎは：</b>${ins.next}` : "";
   $("playerProgress").style.width = "0%";
   $("player").scrollIntoView({ behavior: "smooth", block: "start" });
   $("playerPlay").onclick = () => {

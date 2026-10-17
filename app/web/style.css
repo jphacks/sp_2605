@@ -561,3 +561,20 @@ button { font: inherit; cursor: pointer; }
 .record-player { width: 100%; padding: 16px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: center; }
 .player-info { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 10px; }
 .record-player .expbar { height: 10px; }
+
+/* ---- レコード：1本の輪 ＝ 1回の息 ---- */
+.rec-rank { font-size: 22px; font-weight: 900; fill: #0d1430; }
+.rec-rank.rank-S { fill: #c0392b; }
+.rec-date { font-size: 9px; }
+.rec-star { font-size: 9px; fill: #ffd166; }
+.rec-legend { width: 100%; padding: 10px 16px; display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
+.rec-legend b { color: #ffd166; font-weight: 400; }
+.rec-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; margin: 0 2px; }
+.rec-facts { list-style: none; padding: 0; margin: 0; font-family: "DotGothic16", system-ui, sans-serif; font-size: 13px; color: #ffffff; display: grid; gap: 3px; }
+.rec-facts li::before { content: "・"; color: #ffd166; }
+.rec-next { margin: 0; font-family: "DotGothic16", system-ui, sans-serif; font-size: 14px; color: #b8f2e6; background: rgba(92, 194, 179, 0.12); border-radius: 8px; padding: 8px 10px; }
+.rec-next b { color: #ffd166; font-weight: 400; }
+
+/* hidden 属性を display の指定より優先する（空の箱が出ないように） */
+[hidden] { display: none !important; }
+.rec-rank { font-size: 18px; }

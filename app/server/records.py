@@ -31,6 +31,7 @@ def add(result: dict, game: dict) -> dict:
         "score": game.get("score"),
         "defeated": game.get("defeated"),
         "aura_max": game.get("aura_max", 0),
+        "tiers": game.get("tiers", []),
         "exhale_count": result["exhale_count"],
         "exhale_avg_sec": result["exhale_avg_sec"],
         "stability_avg": result["stability_avg"],

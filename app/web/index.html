@@ -93,6 +93,7 @@
       <p class="new-record-title">きょうの こきゅうが 1まいの レコードに なりました</p>
       <div id="newRecordDisc" class="new-record-disc"></div>
       <p id="newRecordDiary" class="diary"></p>
+      <p id="newRecordNext" class="rec-next"></p>
       <button id="toShelfBtn" class="ghost">レコード棚を ひらく</button>
     </div>
     <p class="tag">ふりかえり</p>
@@ -131,10 +132,19 @@
   <section id="shelf" class="screen">
     <h2>息のレコード棚</h2>
     <p class="lead">1回の演奏が1枚のレコードになります。タップすると、その日の演奏が流れます。</p>
+    <div class="win rec-legend">
+      <b>レコードの みかた</b>
+      <span>1ぽんの わ ＝ 1かいの いき（そとがわから じゅんばん）</span>
+      <span>ふとさ ＝ いきの ながさ（ながく はくほど レコードが うまる）／ ふちの ギザギザ ＝ いきの ぶれ</span>
+      <span>いろ ＝ しずかさ：<i style="background:#ffd166"></i>きん ＞ <i style="background:#5cc2b3"></i>みどり ＞ <i style="background:#6aa8ff"></i>あお ＞ <i style="background:#e8735f"></i>あか</span>
+      <span>まんなかの もじ ＝ ランク（S・A・B・C）／ ふちの ★ ＝ PERFECT の かず</span>
+    </div>
     <div id="player" class="win record-player" hidden>
       <div id="playerDisc" class="player-disc"></div>
       <div class="player-info">
         <p id="playerDiary" class="diary"></p>
+        <ul id="playerFacts" class="rec-facts"></ul>
+        <p id="playerNext" class="rec-next"></p>
         <div class="expbar"><i id="playerProgress"></i></div>
         <div class="actions">
           <button id="playerPlay" class="primary">さいせい</button>
