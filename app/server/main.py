@@ -1,0 +1,126 @@
+"""エア・オカリナのサーバー。
+
+    py app/server/main.py                 # ボード（DPS368=COM4, タッチ=COM3）を使う
+    py app/server/main.py --mock          # ボードなしで疑似の息を流す
+    py app/server/main.py --dps COM5 --touch none
+
+ブラウザで http://localhost:8000/ を開く（受信確認は /debug.html）。
+"""
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import mimetypes
+from http import HTTPStatus
+from pathlib import Path
+
+from websockets.asyncio.server import broadcast, serve
+from websockets.datastructures import Headers
+from websockets.http11 import Response
+
+import store
+from breath import BreathDetector
+from serial_io import SerialReader, mock_pressure, parse_pressure, parse_touch
+
+WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+
+clients = set()
+status = {"dps": False, "touch": False, "mock": False}
+session: store.Session | None = None
+
+
+def send_all(msg: dict) -> None:
+    broadcast(clients, json.dumps(msg, ensure_ascii=False))
+
+
+def serve_static(connection, request):
+    """/ws 以外の HTTP リクエストには web/ のファイルを返す。"""
+    if request.path == "/ws":
+        return None
+    rel = request.path.split("?")[0].lstrip("/") or "index.html"
+    path = (WEB_DIR / rel).resolve()
+    if WEB_DIR not in path.parents or not path.is_file():
+        return connection.respond(HTTPStatus.NOT_FOUND, "Not Found\n")
+    body = path.read_bytes()
+    ctype = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+    if ctype.startswith("text/") or ctype.endswith("javascript"):
+        ctype += "; charset=utf-8"
+    headers = Headers([("Content-Type", ctype), ("Content-Length", str(len(body))), ("Cache-Control", "no-store")])
+    return Response(200, "OK", headers, body)
+
+
+async def handler(ws):
+    global session
+    clients.add(ws)
+    await ws.send(json.dumps({"type": "status", **status}))
+    try:
+        async for raw in ws:
+            msg = json.loads(raw)
+            kind = msg.get("type")
+            if kind == "session_start":
+                session = store.Session(msg.get("song", "unknown"))
+            elif kind == "session_end" and session is not None:
+                result = session.finish(bool(msg.get("completed")))
+                session = None
+                send_all({"type": "session_result", **result})
+            elif kind == "get_history":
+                await ws.send(json.dumps({"type": "history", "days": store.history()}, ensure_ascii=False))
+            elif kind == "touch_key":
+                send_all({"type": "touch", "holes": msg.get("holes", [0, 0, 0, 0]), "source": "keyboard"})
+    finally:
+        clients.discard(ws)
+
+
+async def pump(queue: asyncio.Queue) -> None:
+    """ボードからの値を判定してブラウザへ流す。"""
+    detector = BreathDetector()
+    while True:
+        item = await queue.get()
+        if item[0] == "pressure":
+            _, t, pa = item
+            msg, events = detector.update(t, pa)
+            if msg:
+                send_all(msg)
+            for ev in events:
+                if session is not None:
+                    session.add_event(ev)
+                send_all(ev)
+        elif item[0] == "touch":
+            send_all({"type": "touch", "holes": item[2], "source": "board"})
+        elif item[0] == "status":
+            status[item[1]] = item[2]
+            send_all({"type": "status", **status})
+
+
+async def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dps", default="COM4", help="DPS368 2GO の COM ポート")
+    ap.add_argument("--dps-baud", type=int, default=9600)
+    ap.add_argument("--touch", default="COM3", help="PSOC 4100T Plus の COM ポート（none で使わない）")
+    ap.add_argument("--touch-baud", type=int, default=115200)
+    ap.add_argument("--mock", action="store_true", help="ボードなしで疑似の息を流す")
+    ap.add_argument("--port", type=int, default=8000)
+    args = ap.parse_args()
+
+    loop = asyncio.get_running_loop()
+    queue: asyncio.Queue = asyncio.Queue()
+    tasks = [asyncio.create_task(pump(queue))]
+    if args.mock:
+        status["mock"] = True
+        tasks.append(asyncio.create_task(mock_pressure(queue)))
+    else:
+        SerialReader("dps", args.dps, args.dps_baud, parse_pressure, loop, queue).start()
+    if args.touch.lower() != "none" and not args.mock:
+        SerialReader("touch", args.touch, args.touch_baud, parse_touch, loop, queue).start()
+
+    async with serve(handler, "localhost", args.port, process_request=serve_static):
+        print(f"open http://localhost:{args.port}/  (debug: /debug.html)")
+        await asyncio.Future()
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass

@@ -32,3 +32,13 @@
 - 審査対象は Hack Day の2日間に作った部分のみ。事前にやるのは環境構築と動作確認まで
 - 最終提出は運営から配られる JPHACKS organization のリポジトリ（公開・MITライセンス）。このリポジトリは作業・進捗共有用
 - APIキーやパスワードはコミットしない
+
+## アプリの起動（Hi6to のPC）
+
+```bash
+py app/server/main.py            # ボードを使う（DPS368=COM4, タッチ=COM3）
+py app/server/main.py --mock     # ボードなしで疑似の息を流す（誰のPCでも動く）
+```
+
+ブラウザで http://localhost:8000/ を開く。受信の確認は http://localhost:8000/debug.html（キーボードの 1〜4 で指穴を代用できる）。
+必要なもの：Python 3 と `py -m pip install pyserial websockets`
