@@ -237,10 +237,12 @@ function setSensor(text, ok) {
 
 // ---------- キーボード（開発・デモの予備） ----------
 let spaceDown = false;
+let spaceStart = 0;
 addEventListener("keydown", (e) => {
   if (e.code === "Space" && !e.repeat) {
     e.preventDefault();
     spaceDown = true;
+    spaceStart = performance.now();
     ensureAudio();
     onBreathSample({ state: "exhale", delta: maxDelta * 0.6 });
     onExhaleStart();
@@ -251,6 +253,7 @@ addEventListener("keydown", (e) => {
 addEventListener("keyup", (e) => {
   if (e.code === "Space" && spaceDown) {
     spaceDown = false;
+    if (screen === "play" && !waitRelease) send({ type: "breath_key", duration: (performance.now() - spaceStart) / 1000 });
     onBreathSample({ state: "idle", delta: 0 });
     onExhaleEnd();
   }

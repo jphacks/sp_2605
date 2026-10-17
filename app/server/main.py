@@ -68,6 +68,10 @@ async def handler(ws):
                 send_all({"type": "session_result", **result})
             elif kind == "get_history":
                 await ws.send(json.dumps({"type": "history", "days": store.history()}, ensure_ascii=False))
+            elif kind == "breath_key" and session is not None:
+                # センサー不調時の予備（スペースキー）。強さ・安定度は測れないので固定値で記録する
+                session.add_event({"event": "exhale_end", "duration": float(msg.get("duration", 0)),
+                                   "mean_delta": 150.0, "stability": 0.8, "source": "keyboard"})
             elif kind == "touch_key":
                 send_all({"type": "touch", "holes": msg.get("holes", [0, 0, 0, 0]), "source": "keyboard"})
     finally:
