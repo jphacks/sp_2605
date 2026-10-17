@@ -1,5 +1,6 @@
 import { SONGS, noteToFreq, holeFor } from "./songs.js";
 import { ensureAudio, setBreathLevel, Voice, sparkle } from "./audio.js";
+import { barChart, lineChart } from "./charts.js";
 
 const $ = (id) => document.getElementById(id);
 const MAX_HOLD_SEC = 6; // フレーズの最後の音を伸ばせる上限
@@ -198,8 +199,54 @@ function showResult(r) {
   $("rMax").textContent = r.exhale_max_sec.toFixed(1);
   $("rStab").textContent = `${Math.round(r.stability_avg * 100)}%`;
   $("rHit").textContent = hitRate;
+  renderPhraseCharts(r.exhales || []);
   player = null;
   show("result");
+}
+
+// ---------- グラフ ----------
+const pct = (v) => Math.round(v * 100);
+const maxOf = (values, floor) => Math.max(floor, Math.ceil(Math.max(0, ...values)));
+
+// 今回の1曲：フレーズ（＝1回の吐く息）ごと。その場で吹いたデータだけで見せられる
+function renderPhraseCharts(exhales) {
+  const items = exhales.map((e, i) => ({ label: `${i + 1}`, duration: e.duration, stability: e.stability }));
+  if (!items.length) {
+    $("cPhraseLen").innerHTML = '<p class="note">息の記録がありません（センサーを確認）</p>';
+    $("cPhraseStab").innerHTML = "";
+    return;
+  }
+  barChart($("cPhraseLen"), "吐いた長さ（秒）", items.map((d) => ({ label: d.label, value: d.duration })),
+    { maxY: maxOf(items.map((d) => d.duration), 6), unit: "秒" });
+  barChart($("cPhraseStab"), "息の安定度（%）", items.map((d) => ({ label: d.label, value: pct(d.stability) })),
+    { maxY: 100, unit: "%", format: (v) => `${Math.round(v)}` });
+}
+
+// 記録：これまでの演奏（本物のデータ）と、日ごとの推移（サンプルは灰色）
+function renderHistory(m) {
+  const sess = m.sessions || [];
+  $("noSessions").hidden = sess.length > 0;
+  if (sess.length) {
+    const label = (s, i) => `${i + 1}回目`;
+    lineChart($("cSessLen"), "平均の吐く長さ（秒）", sess.map((s, i) => ({ label: label(s, i), value: s.exhale_avg_sec })),
+      { maxY: maxOf(sess.map((s) => s.exhale_avg_sec), 6), unit: "秒" });
+    lineChart($("cSessStab"), "平均の安定度（%）", sess.map((s, i) => ({ label: label(s, i), value: pct(s.stability_avg) })),
+      { maxY: 100, unit: "%", format: (v) => `${Math.round(v)}` });
+  } else {
+    $("cSessLen").innerHTML = "";
+    $("cSessStab").innerHTML = "";
+  }
+  const days = m.days || [];
+  const dayLabel = (d) => `${Number(d.date.slice(5, 7))}/${Number(d.date.slice(8, 10))}`;
+  lineChart($("cDayLen"), "1日の平均の吐く長さ（秒）", days.map((d) => ({ label: dayLabel(d), value: d.exhale_avg_sec, sample: d.sample })),
+    { maxY: maxOf(days.map((d) => d.exhale_avg_sec), 6), unit: "秒" });
+  lineChart($("cDayStab"), "1日の平均の安定度（%）", days.map((d) => ({ label: dayLabel(d), value: pct(d.stability_avg), sample: d.sample })),
+    { maxY: 100, unit: "%", format: (v) => `${Math.round(v)}` });
+}
+
+function showRecords() {
+  send({ type: "get_history" });
+  show("records");
 }
 
 // ---------- 息のイベント（サーバー or スペースキー） ----------
@@ -227,6 +274,7 @@ function connect() {
       if (m.event === "exhale_end" || m.event === "baseline_reset") onExhaleEnd();
     } else if (m.type === "touch" && m.source === "board") setHoles(m.holes);
     else if (m.type === "session_result") showResult(m);
+    else if (m.type === "history") renderHistory(m);
     else if (m.type === "status") setSensor(m.mock ? "センサー：疑似データ" : m.dps ? "センサー：接続中" : "センサー：未接続", m.dps);
   };
 }
@@ -268,6 +316,9 @@ $("startBtn").onclick = () => start(false);
 $("quitBtn").onclick = () => finish(false);
 $("againBtn").onclick = () => start(false);
 $("homeBtn").onclick = () => show("home");
+$("recordsBtn").onclick = showRecords;
+$("homeRecordsBtn").onclick = showRecords;
+$("recordsHomeBtn").onclick = () => show("home");
 
 renderSongs();
 connect();

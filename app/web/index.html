@@ -20,6 +20,7 @@
     <div id="songs" class="songs"></div>
     <p class="hint breathe-hint">ストローを軽く吹いてはじめよう</p>
     <button id="startBtn" class="primary">はじめる</button>
+    <button id="homeRecordsBtn" class="ghost">記録を見る</button>
   </section>
 
   <!-- 演奏 -->
@@ -53,9 +54,35 @@
       <div><b id="rStab">-</b><span>息の安定度</span></div>
       <div><b id="rHit">-</b><span>指穴の正解</span></div>
     </div>
+    <h3 class="section-title">今回の1曲：フレーズごとの息</h3>
+    <div class="charts">
+      <div id="cPhraseLen"></div>
+      <div id="cPhraseStab"></div>
+    </div>
     <div class="actions">
       <button id="againBtn" class="primary">もう1曲</button>
+      <button id="recordsBtn" class="ghost">記録を見る</button>
       <button id="homeBtn" class="ghost">ホームへ</button>
+    </div>
+  </section>
+
+  <!-- 記録 -->
+  <section id="records" class="screen">
+    <h2>記録</h2>
+    <h3 class="section-title">これまでの演奏</h3>
+    <p id="noSessions" class="lead">まだ記録がありません。1曲吹くとここに並びます。</p>
+    <div class="charts">
+      <div id="cSessLen"></div>
+      <div id="cSessStab"></div>
+    </div>
+    <h3 class="section-title">日ごとの推移</h3>
+    <p class="note"><span class="swatch sample"></span>灰色の点線は<b>サンプルデータ</b>（続けた場合のイメージ）、<span class="swatch real"></span>緑が実際の記録です。</p>
+    <div class="charts">
+      <div id="cDayLen"></div>
+      <div id="cDayStab"></div>
+    </div>
+    <div class="actions">
+      <button id="recordsHomeBtn" class="primary">ホームへ</button>
     </div>
   </section>
 </main>

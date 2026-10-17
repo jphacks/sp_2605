@@ -36,6 +36,8 @@ class Session:
             "exhale_max_sec": round(max(durations), 2) if ex else 0.0,
             "stability_avg": round(statistics.fmean(e["stability"] for e in ex), 3) if ex else 0.0,
             "strength_avg": round(statistics.fmean(e["mean_delta"] for e in ex) / 300, 3) if ex else 0.0,
+            # フレーズ（＝1回の吐く息）ごとの記録。「今回の1曲」のグラフに使う
+            "exhales": [{"duration": round(e["duration"], 2), "stability": round(e["stability"], 3)} for e in ex],
         }
         DATA_DIR.mkdir(exist_ok=True)
         with SESSIONS.open("a", encoding="utf-8") as f:
@@ -49,19 +51,29 @@ def _read(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def history(include_sample: bool = True) -> list[dict]:
-    """日ごとの集計（古い順）。"""
-    rows = (_read(SAMPLE) if include_sample else []) + _read(SESSIONS)
+def history(recent: int = 20) -> dict:
+    """記録の集計。
+
+    sessions: 本物の演奏の記録（新しい順に recent 件を、古い順で返す）
+    days:     日ごとの平均（古い順）。サンプルデータの日は sample=True で区別する
+    """
+    real = [r for r in _read(SESSIONS) if r.get("exhale_count")]
+    sample = [dict(r, sample=True) for r in _read(SAMPLE)]
+    sessions = [
+        {"id": r["id"], "exhale_avg_sec": r["exhale_avg_sec"], "stability_avg": r["stability_avg"], "song": r["song"]}
+        for r in real[-recent:]
+    ]
     by_day: dict[str, list[dict]] = defaultdict(list)
-    for r in rows:
+    for r in sample + real:
         by_day[r["date"]].append(r)
-    out = []
+    days = []
     for day in sorted(by_day):
         rs = by_day[day]
-        out.append({
+        days.append({
             "date": day,
+            "sample": all(r.get("sample") for r in rs),
             "sessions": len(rs),
             "exhale_avg_sec": round(statistics.fmean(r["exhale_avg_sec"] for r in rs), 2),
             "stability_avg": round(statistics.fmean(r["stability_avg"] for r in rs), 3),
         })
-    return out
+    return {"sessions": sessions, "days": days}

@@ -67,7 +67,7 @@ async def handler(ws):
                 session = None
                 send_all({"type": "session_result", **result})
             elif kind == "get_history":
-                await ws.send(json.dumps({"type": "history", "days": store.history()}, ensure_ascii=False))
+                await ws.send(json.dumps({"type": "history", **store.history()}, ensure_ascii=False))
             elif kind == "breath_key" and session is not None:
                 # センサー不調時の予備（スペースキー）。強さ・安定度は測れないので固定値で記録する
                 session.add_event({"event": "exhale_end", "duration": float(msg.get("duration", 0)),
