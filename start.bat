@@ -1,5 +1,5 @@
 @echo off
-rem エア・オカリナを起動する（ダブルクリックで動く）。ボードの COM ポートは自動で探す。
+rem シン呼吸を起動する（ダブルクリックで動く）。ボードの COM ポートは自動で探す。
 cd /d %~dp0
 set PY=py
 where py > nul 2> nul || set PY=python

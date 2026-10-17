@@ -1,4 +1,4 @@
-"""エア・オカリナのサーバー。
+"""シン呼吸のサーバー。
 
     py app/server/main.py                 # ボードを使う（COM ポートは自動で探す）
     py app/server/main.py --mock          # ボードなしで疑似の息を流す

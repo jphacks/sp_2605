@@ -1,4 +1,4 @@
-# エア・オカリナ 〜吹くだけで呼吸が整う楽器〜
+# シン呼吸 〜吹くだけで呼吸が整う楽器〜
 
 <!-- デモ動画：撮影後に、画像（サムネイル）と YouTube のリンクを差し替える -->
 [![デモ動画（準備中）](https://jphacks.com/wp-content/uploads/2026/07/IMG_5316.png)](https://www.youtube.com/watch?v=piaNsc6ilBI)
