@@ -227,8 +227,8 @@ button { font: inherit; cursor: pointer; }
 
 .game-result { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
 .outcome { font-size: clamp(26px, 5vw, 38px); font-weight: 800; margin: 0; }
-.outcome.win { color: #f2b33d; }
-.outcome.close { color: var(--accent); }
+.outcome.is-win { color: #f2b33d; }
+.outcome.is-close { color: var(--accent); }
 .score-line { margin: 4px 0; color: var(--muted); }
 .score-line b { font-size: 32px; color: var(--ink); margin-left: 6px; }
 .breakdown { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-weight: 700; font-size: 14px; }

@@ -334,7 +334,7 @@ function renderGameResult(s) {
   if (!s) { box.hidden = true; return; }
   box.hidden = false;
   $("outcome").textContent = s.defeated ? "勝利！" : "あと少し！ 敵は逃げていった";
-  $("outcome").className = "outcome " + (s.defeated ? "win" : "close");
+  $("outcome").className = "outcome " + (s.defeated ? "is-win" : "is-close");
   if (s.defeated) setTimeout(() => confetti(220), 300);
   $("score").textContent = s.score;
   $("breakdown").innerHTML = Object.entries(s.count)
