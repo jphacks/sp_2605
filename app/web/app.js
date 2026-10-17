@@ -3,6 +3,7 @@ import { ensureAudio, setBreathLevel, Voice, sparkle } from "./audio.js";
 import { barChart, lineChart } from "./charts.js";
 import { showReview } from "./review.js";
 import { DIFFICULTIES, DIFFICULTY_ORDER, Battle, judgePhrase, summarize } from "./game.js";
+import { setStream, confetti } from "./fx.js";
 
 const $ = (id) => document.getElementById(id);
 const MAX_HOLD_SEC = 6; // フレーズの最後の音を伸ばせる上限
@@ -43,6 +44,10 @@ function onBreathSample(m) {
   setBreathLevel(level, $("followBreath").checked);
   $("meterFill").style.width = `${Math.round(level * 100)}%`;
   breathLevel = level;
+  // 吹いている間、笛から敵へ光の粒が流れる（息で攻撃している演出）
+  const attacking = screen === "play" && player && player.state === "playing";
+  setStream(attacking ? level : 0, document.querySelector(".flute .mouth"), player?.battle.target);
+  player?.battle.setBreath(attacking ? level : 0);
 }
 
 // ---------- 呼吸の波（結果画面用）：演奏中の息の強さを 0.1秒ごとに記録 ----------
@@ -73,6 +78,7 @@ class Player {
     this.hits = 0;
     this.total = 0;
     this.results = [];
+    this.combo = 0;
     this.resetPhraseStats();
     this.battle = new Battle($("battle"), id);
     this.renderPhrase();
@@ -122,7 +128,8 @@ class Player {
     const hitRatio = this.phraseTotal ? this.phraseHits / this.phraseTotal : 0;
     const r = judgePhrase(this.diff, { stability, cut, hitRatio }, this.song.phrases.length);
     this.results.push(r);
-    this.battle.hit(r);
+    this.combo = r.tier === "MISS" ? 0 : this.combo + 1;
+    this.battle.hit(r, this.combo);
     this.resetPhraseStats();
   }
 
@@ -278,6 +285,7 @@ function renderGameResult(s) {
   box.hidden = false;
   $("outcome").textContent = s.defeated ? "勝利！" : "あと少し！ 敵は逃げていった";
   $("outcome").className = "outcome " + (s.defeated ? "win" : "close");
+  if (s.defeated) setTimeout(() => confetti(220), 300);
   $("score").textContent = s.score;
   $("breakdown").innerHTML = Object.entries(s.count)
     .filter(([tier, n]) => n || tier !== "GREAT")

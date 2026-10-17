@@ -1,3 +1,6 @@
+import { burst, confetti, shake, flash } from "./fx.js";
+import { hitSfx, defeatSfx } from "./audio.js";
+
 // ゲーム（RPG）の試作：難易度・フレーズごとの判定・ダメージ・敵の表示。
 // 数値はすべて仮。チームの計測（TASKS の R07）とヒアリング（R06）で決まったら、ここだけ変える。
 
@@ -47,7 +50,16 @@ export function judgePhrase(diff, { stability, cut, hitRatio }, phraseCount) {
   return { tier, damage, points: GAME.points[tier] };
 }
 
-// 戦闘の表示
+// 戦闘の表示（ド派手版）
+//  判定は画面中央に大きく、ダメージの数字は敵から飛び出す。PERFECT は金色の光と画面の揺れ。
+//  連続で成功するとコンボ表示。倒したら爆発・「DEFEATED!」・紙吹雪。
+const TIER_FX = {
+  PERFECT: { colors: ["#ffd166", "#fff3b0", "#ffffff", "#f2b33d"], count: 90, speed: 700, stars: true, shake: 1.6 },
+  GREAT: { colors: ["#5cc2b3", "#b8f2e6", "#ffffff"], count: 55, speed: 560, stars: true, shake: 1 },
+  GOOD: { colors: ["#5c9ad6", "#cfe3ff"], count: 35, speed: 460, stars: false, shake: 0.6 },
+  MISS: null,
+};
+
 export class Battle {
   constructor(root, songId) {
     const enemy = ENEMIES[songId] || { name: "まものスライム", color: "#8fa3a8" };
@@ -55,39 +67,100 @@ export class Battle {
     this.defeated = false;
     root.innerHTML = `
       <div class="enemy-name">${enemy.name}</div>
-      <div class="enemy" style="--enemy:${enemy.color}"><div class="eyes"><i></i><i></i></div></div>
-      <div class="hpbar"><div class="hpfill"></div></div>
+      <div class="enemy-wrap"><div class="enemy" style="--enemy:${enemy.color}"><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div></div>
+      <div class="hpbar"><div class="hpghost"></div><div class="hpfill"></div></div>
       <span class="hptext">HP ${this.hp}</span>
-      <div class="floats"></div>`;
+      <div class="judge-banner"></div>
+      <div class="combo"></div>
+      <div class="dmg-layer"></div>`;
     this.root = root;
     this.enemyEl = root.querySelector(".enemy");
+    this.wrap = root.querySelector(".enemy-wrap");
     this.fill = root.querySelector(".hpfill");
+    this.ghost = root.querySelector(".hpghost");
     this.text = root.querySelector(".hptext");
-    this.floats = root.querySelector(".floats");
+    this.banner = root.querySelector(".judge-banner");
+    this.comboEl = root.querySelector(".combo");
+    this.dmgLayer = root.querySelector(".dmg-layer");
+  }
+
+  get target() { return this.enemyEl; }
+
+  // 吹いている間、敵が「効いている」様子で震える
+  setBreath(level) {
+    this.enemyEl.style.setProperty("--tremble", `${Math.round(level * 4)}px`);
+    this.enemyEl.classList.toggle("taking", level > 0.15 && !this.defeated);
+  }
+
+  restart(el, cls) {
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
   }
 
   // 判定を表示してダメージを与える。この攻撃で倒したら true
-  hit({ tier, damage }) {
-    const f = document.createElement("div");
-    f.className = `float ${tier.toLowerCase()}`;
-    f.innerHTML = `${tier}<b>${damage ? damage : ""}</b>`;
-    this.floats.append(f);
-    setTimeout(() => f.remove(), 1600);
-    if (!damage || this.defeated) return false;
+  hit({ tier, damage }, combo) {
+    // 中央の大きな判定
+    this.banner.className = `judge-banner ${tier.toLowerCase()}`;
+    this.banner.innerHTML = tier === "MISS" ? "MISS…" : `${tier}!`;
+    this.restart(this.banner, "show");
+    hitSfx(tier);
 
+    // コンボ
+    if (combo >= 2 && tier !== "MISS") {
+      this.comboEl.innerHTML = `<b>${combo}</b> COMBO!`;
+      this.restart(this.comboEl, "show");
+    }
+
+    if (tier === "MISS" || !damage) {
+      this.restart(this.enemyEl, "dodge");
+      return false;
+    }
+
+    // 敵：白く光る・のけぞる・つぶれる
+    this.restart(this.enemyEl, tier === "PERFECT" ? "hit-big" : "hit");
+    const f = TIER_FX[tier];
+    burst(this.enemyEl, f);
+    shake(this.root.closest(".screen"), f.shake);
+    if (tier === "PERFECT") flash("rgba(255, 220, 120, 0.35)");
+
+    // 敵から飛び出すダメージの数字
+    const d = document.createElement("div");
+    d.className = `dmg ${tier.toLowerCase()}`;
+    d.textContent = damage;
+    d.style.setProperty("--dx", `${(Math.random() - 0.5) * 160}px`);
+    this.dmgLayer.append(d);
+    setTimeout(() => d.remove(), 1400);
+
+    if (this.defeated) return false; // フィナーレ中はダメージ表示だけ
+
+    // HP：先に本体が減り、白い残像が遅れて追いかける
     this.hp = Math.max(0, this.hp - damage);
-    this.fill.style.width = `${(this.hp / GAME.hp) * 100}%`;
+    const pct = `${(this.hp / GAME.hp) * 100}%`;
+    this.fill.style.width = pct;
+    setTimeout(() => { this.ghost.style.width = pct; }, 450);
     this.text.textContent = `HP ${this.hp}`;
-    this.enemyEl.classList.remove("shake");
-    void this.enemyEl.offsetWidth; // アニメーションをやり直すため
-    this.enemyEl.classList.add("shake");
+    this.restart(this.root.querySelector(".hpbar"), "jolt");
+
     if (this.hp === 0) {
       this.defeated = true;
-      this.enemyEl.classList.add("defeated");
-      this.text.textContent = "たおした！ ここからフィナーレ";
+      setTimeout(() => this.defeat(), 500);
       return true;
     }
     return false;
+  }
+
+  defeat() {
+    defeatSfx();
+    flash("rgba(255,255,255,0.8)");
+    burst(this.enemyEl, { colors: ["#ffd166", "#e86a5a", "#ffffff", "#5cc2b3", "#b48ae6"], count: 160, speed: 900, size: 8, stars: true });
+    shake(this.root.closest(".screen"), 2.4);
+    this.enemyEl.classList.add("defeated");
+    this.banner.className = "judge-banner defeat";
+    this.banner.textContent = "DEFEATED!";
+    this.restart(this.banner, "show");
+    this.text.textContent = "たおした！ ここからフィナーレ";
+    confetti();
   }
 }
 

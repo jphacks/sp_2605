@@ -118,6 +118,113 @@ button { font: inherit; cursor: pointer; }
 .float.perfect { color: #f2b33d; } .float.great { color: var(--accent); } .float.good { color: #5c9ad6; } .float.miss { color: var(--muted); }
 @keyframes floatUp { from { opacity: 0; transform: translate(-50%, 10px) scale(0.8); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.1); } to { opacity: 0; transform: translate(-50%, -40px) scale(1); } }
 
+/* ---- ド派手版：敵・判定・ダメージ・コンボ・画面全体のエフェクト ---- */
+.fx-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 50; }
+.fx-flash { position: fixed; inset: 0; pointer-events: none; z-index: 49; animation: flashOut 0.45s ease-out forwards; }
+@keyframes flashOut { from { opacity: 1; } to { opacity: 0; } }
+.screen-shake { animation: screenShake 0.45s cubic-bezier(.36,.07,.19,.97); }
+@keyframes screenShake {
+  10%, 90% { transform: translate(calc(var(--shake) * -0.3), 0); }
+  20%, 80% { transform: translate(calc(var(--shake) * 0.6), calc(var(--shake) * -0.3)); }
+  30%, 50%, 70% { transform: translate(calc(var(--shake) * -1), calc(var(--shake) * 0.4)); }
+  40%, 60% { transform: translate(var(--shake), calc(var(--shake) * -0.4)); }
+}
+
+.battle { min-height: 250px; }
+.enemy-name { font-size: 18px; font-weight: 800; letter-spacing: 0.05em; }
+.enemy-wrap { height: 150px; display: flex; align-items: flex-end; justify-content: center; }
+.enemy { width: 160px; height: 124px; animation: idle 1.8s ease-in-out infinite; transform-origin: 50% 100%; }
+.enemy .eyes { top: 46px; gap: 32px; }
+.enemy .eyes i { width: 16px; height: 22px; }
+.enemy .mouth { position: absolute; left: 50%; top: 78px; width: 26px; height: 10px; margin-left: -13px; border-radius: 0 0 14px 14px; background: #1f2a2e; opacity: 0.75; }
+@keyframes idle {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  40% { transform: translateY(-14px) scale(0.94, 1.08); }
+  70% { transform: translateY(0) scale(1.1, 0.9); }
+}
+/* 息を受けている間は小刻みに震える */
+.enemy.taking { animation: tremble 0.12s linear infinite; }
+@keyframes tremble { 0% { transform: translate(var(--tremble), 0); } 50% { transform: translate(calc(var(--tremble) * -1), 1px); } 100% { transform: translate(var(--tremble), 0); } }
+/* ダメージ：白く光ってのけぞる・つぶれる */
+.enemy.hit { animation: hit 0.5s ease-out; }
+.enemy.hit-big { animation: hitBig 0.7s ease-out; }
+@keyframes hit {
+  0% { filter: brightness(3) saturate(0); transform: translate(18px, -6px) rotate(8deg) scale(1.1, 0.85); }
+  40% { filter: brightness(1.4); transform: translate(-8px, 0) rotate(-4deg) scale(0.95, 1.08); }
+  100% { filter: none; transform: none; }
+}
+@keyframes hitBig {
+  0% { filter: brightness(4) saturate(0); transform: translate(34px, -18px) rotate(16deg) scale(1.25, 0.7); }
+  25% { filter: brightness(2); transform: translate(-16px, 4px) rotate(-8deg) scale(0.85, 1.2); }
+  55% { filter: brightness(1.2); transform: translate(8px, 0) rotate(3deg) scale(1.08, 0.94); }
+  100% { filter: none; transform: none; }
+}
+.enemy.dodge { animation: dodge 0.6s ease-out; }
+@keyframes dodge { 0% { transform: none; } 30% { transform: translateX(-40px) rotate(-10deg); } 60% { transform: translateX(10px); } 100% { transform: none; } }
+.enemy.defeated { animation: explode 0.9s ease-in forwards; }
+@keyframes explode {
+  0% { filter: brightness(4); transform: scale(1.3, 0.8); opacity: 1; }
+  30% { transform: scale(1.6) rotate(20deg); opacity: 1; }
+  100% { transform: scale(0) rotate(200deg) translateY(-60px); opacity: 0; }
+}
+
+.hpbar { height: 18px; border-radius: 9px; border: 2px solid var(--ink); background: #2a1f1f; }
+.hpghost { position: absolute; inset: 0 auto 0 0; width: 100%; background: #ffffff; transition: width 0.9s ease; }
+.hpfill { position: relative; transition: width 0.25s ease-out; }
+.hpbar.jolt { animation: jolt 0.35s; }
+@keyframes jolt { 25% { transform: translateX(-6px) scaleY(1.2); } 60% { transform: translateX(5px); } }
+
+/* 判定：画面中央に大きく */
+.judge-banner { position: absolute; left: 50%; top: 70px; transform: translate(-50%, 0); font-weight: 900; font-size: clamp(44px, 9vw, 80px); letter-spacing: 0.04em; pointer-events: none; opacity: 0; white-space: nowrap; z-index: 5; -webkit-text-stroke: 3px rgba(0,0,0,0.25); }
+.judge-banner.show { animation: bannerIn 1.3s cubic-bezier(.2,1.5,.4,1) forwards; }
+.judge-banner.perfect { background: linear-gradient(90deg, #ffd166, #fff3b0, #f2b33d, #ffd166); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 18px rgba(255, 200, 80, 0.9)); }
+.judge-banner.perfect.show { animation: bannerIn 1.3s cubic-bezier(.2,1.5,.4,1) forwards, shimmer 0.6s linear infinite; }
+.judge-banner.great { color: #3fbfa8; filter: drop-shadow(0 0 14px rgba(92, 194, 179, 0.8)); }
+.judge-banner.good { color: #4f8fd8; filter: drop-shadow(0 0 10px rgba(92, 154, 214, 0.7)); }
+.judge-banner.miss { color: #8a969a; font-size: clamp(36px, 7vw, 60px); }
+.judge-banner.miss.show { animation: missDrop 1.2s ease-out forwards; }
+.judge-banner.defeat { color: #e86a5a; filter: drop-shadow(0 0 20px rgba(232, 106, 90, 0.9)); }
+@keyframes bannerIn {
+  0% { opacity: 0; transform: translate(-50%, 20px) scale(2.6) rotate(-8deg); }
+  18% { opacity: 1; transform: translate(-50%, 0) scale(0.9) rotate(2deg); }
+  30% { transform: translate(-50%, 0) scale(1.08) rotate(0); }
+  75% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -30px) scale(1.15); }
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+@keyframes missDrop {
+  0% { opacity: 0; transform: translate(-50%, -30px); }
+  20% { opacity: 1; transform: translate(-50%, 0) rotate(-4deg); }
+  35% { transform: translate(-50%, -8px) rotate(3deg); }
+  50% { transform: translate(-50%, 0) rotate(-2deg); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, 30px) rotate(6deg); }
+}
+
+/* コンボ */
+.combo { position: absolute; right: 4%; top: 10px; font-weight: 900; font-size: 20px; color: #e86a5a; opacity: 0; pointer-events: none; }
+.combo b { font-size: 44px; margin-right: 4px; }
+.combo.show { animation: comboIn 1.6s ease-out forwards; }
+@keyframes comboIn { 0% { opacity: 0; transform: scale(2) rotate(10deg); } 15% { opacity: 1; transform: scale(1) rotate(-6deg); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-20px) rotate(-6deg); } }
+
+/* ダメージの数字：敵から弧を描いて飛び出す */
+.dmg-layer { position: absolute; left: 50%; top: 90px; width: 0; height: 0; pointer-events: none; z-index: 6; }
+.dmg { position: absolute; transform: translate(-50%, 0); font-weight: 900; font-size: 48px; color: #fff; -webkit-text-stroke: 3px #e86a5a; animation: dmgArc 1.3s cubic-bezier(.2,.8,.3,1) forwards; }
+.dmg.perfect { font-size: 64px; -webkit-text-stroke-color: #c98200; color: #fff3b0; }
+.dmg.good { font-size: 40px; -webkit-text-stroke-color: #2f6db0; }
+.dmg.great { -webkit-text-stroke-color: #1e8c7a; }
+@keyframes dmgArc {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.3); }
+  15% { opacity: 1; transform: translate(calc(-50% + var(--dx) * 0.3), -70px) scale(1.4); }
+  40% { transform: translate(calc(-50% + var(--dx) * 0.7), -90px) scale(1); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), 20px) scale(0.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enemy, .enemy.taking, .enemy.hit, .enemy.hit-big, .enemy.dodge { animation: none; }
+  .judge-banner.show, .judge-banner.miss.show { animation: bannerIn 1.3s linear forwards; }
+}
+
 .game-result { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
 .outcome { font-size: clamp(26px, 5vw, 38px); font-weight: 800; margin: 0; }
 .outcome.win { color: #f2b33d; }

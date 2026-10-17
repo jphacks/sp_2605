@@ -64,6 +64,45 @@ export class Voice {
   }
 }
 
+// ゲームの効果音（短い合成音）
+function tone(freq, start, dur, { type = "square", gain = 0.12, slideTo } = {}) {
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, start);
+  if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, start + dur);
+  g.gain.setValueAtTime(gain, start);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  o.connect(g).connect(ctx.destination);
+  o.start(start);
+  o.stop(start + dur + 0.02);
+}
+
+export function hitSfx(tier) {
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  if (tier === "MISS") {
+    tone(220, t, 0.25, { type: "triangle", gain: 0.15, slideTo: 110 });
+    return;
+  }
+  // 打撃音
+  tone(180, t, 0.12, { type: "square", gain: 0.18, slideTo: 60 });
+  if (tier === "PERFECT") {
+    [1046, 1318, 1568, 2093].forEach((f, i) => tone(f, t + 0.05 + i * 0.05, 0.25, { type: "triangle", gain: 0.08 }));
+  } else if (tier === "GREAT") {
+    [880, 1175].forEach((f, i) => tone(f, t + 0.05 + i * 0.06, 0.2, { type: "triangle", gain: 0.07 }));
+  } else {
+    tone(784, t + 0.05, 0.15, { type: "triangle", gain: 0.06 });
+  }
+}
+
+export function defeatSfx() {
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  tone(300, t, 0.5, { type: "sawtooth", gain: 0.12, slideTo: 40 });
+  [523, 659, 784, 1046].forEach((f, i) => tone(f, t + 0.35 + i * 0.12, 0.35, { type: "square", gain: 0.07 }));
+}
+
 // 正しい穴を押した時のきらっとした効果音
 export function sparkle() {
   if (!ctx) return;
