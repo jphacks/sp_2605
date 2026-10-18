@@ -99,6 +99,7 @@ class Player {
     this.total = 0;
     this.results = [];
     this.combo = 0;
+    this.breaths = []; // この回の吐く息（サーバーが再起動しても結果を出せるように、画面側でも覚えておく）
     this.holeStreak = 0; // 指穴が続けて合った回数
     this.resetPhraseStats();
     this.battle = new Battle($("battle"), currentStage(), me);
@@ -137,6 +138,9 @@ class Player {
 
   exhaleEnd(ev) {
     this.updateStatus(ev);
+    if (typeof ev?.duration === "number") {
+      this.breaths.push({ duration: ev.duration, stability: ev.stability ?? 0.8, mean_delta: ev.mean_delta ?? 150 });
+    }
     if (this.state === "playing") {
       this.stopNote();
       this.phraseBreaths.push(ev);
@@ -338,14 +342,32 @@ function finish(completed) {
       trace,
     };
   }
-  send({ type: "session_end", completed, game });
+  send({ type: "session_end", completed, game, song: songId, breaths: player?.breaths || [] });
   if (completed) {
     prompt("おつかれさまでした", "exhale");
+    // 保険：サーバーから結果が届かない（接続が切れている等）時は、画面側の記録だけで結果画面に進む
+    const p = player;
+    setTimeout(() => { if (player === p && screen === "play") showResult(localResult(p)); }, 4000);
   } else {
     stopTrace();
     player = null;
     show("home");
   }
+}
+
+// サーバーに届かなかった時の結果（経験値・レコードは保存できないので出さない）
+function localResult(p) {
+  const ex = p.breaths;
+  const avg = (k) => (ex.length ? ex.reduce((s, e) => s + e[k], 0) / ex.length : 0);
+  return {
+    completed: true,
+    exhale_count: ex.length,
+    exhale_avg_sec: avg("duration"),
+    exhale_max_sec: ex.length ? Math.max(...ex.map((e) => e.duration)) : 0,
+    stability_avg: avg("stability"),
+    duration_sec: trace.length ? trace[trace.length - 1][0] : 0,
+    exhales: ex.map((e) => ({ duration: e.duration, stability: e.stability })),
+  };
 }
 
 function showResult(r) {

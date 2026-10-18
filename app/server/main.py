@@ -76,7 +76,16 @@ async def handler(ws):
                 session = store.Session(msg.get("song", "unknown"))
                 # ほかの画面（別のタブ・別のウィンドウ）で演奏中なら止めてもらう（観戦の画面は映し続ける）
                 broadcast([c for c in clients if c is not ws], json.dumps({"type": "session_owner"}))
-            elif kind == "session_end" and session is not None:
+            elif kind == "session_end":
+                # 演奏の途中でサーバーが再起動した・接続が切れた時は、サーバーが息を一部（または全部）知らない。
+                # 画面側が覚えている息のほうが多ければ、そちらから作り直して結果を返す（結果画面に進めなくなるのを防ぐ）
+                breaths = msg.get("breaths") or []
+                if session is None or len(session.exhales) < len(breaths):
+                    session = store.Session(msg.get("song", "unknown"))
+                    for b in breaths:
+                        session.add_event({"event": "exhale_end", "duration": float(b.get("duration", 0)),
+                                           "mean_delta": float(b.get("mean_delta", 150.0)),
+                                           "stability": float(b.get("stability", 0.8))})
                 result = session.finish(bool(msg.get("completed")), msg.get("game"))
                 session = None
                 send_all({"type": "session_result", **result})
