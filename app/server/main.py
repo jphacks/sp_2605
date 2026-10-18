@@ -74,6 +74,8 @@ async def handler(ws):
                 broadcast([c for c in clients if c is not ws], raw)
             elif kind == "session_start":
                 session = store.Session(msg.get("song", "unknown"))
+                # ほかの画面（別のタブ・別のウィンドウ）で演奏中なら止めてもらう（観戦の画面は映し続ける）
+                broadcast([c for c in clients if c is not ws], json.dumps({"type": "session_owner"}))
             elif kind == "session_end" and session is not None:
                 result = session.finish(bool(msg.get("completed")), msg.get("game"))
                 session = None

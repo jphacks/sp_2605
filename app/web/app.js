@@ -561,7 +561,9 @@ function showRecords() {
 // ---------- 息のイベント（サーバー or スペースキー） ----------
 function onExhaleStart() {
   if (screen === "home") {
-    if (!WATCH) act("start", { song: songId, diff: diffKey, byBreath: true }); // 観戦側は演奏側の合図で始める
+    // 観戦側は演奏側の合図で始める。息は同じサーバーにつながる全部の画面に届くので、
+    // 操作中のウィンドウだけが始める（裏のタブや別のウィンドウが勝手に演奏して音が重ならないように）
+    if (!WATCH && document.hasFocus()) act("start", { song: songId, diff: diffKey, byBreath: true });
     return;
   }
   if (screen === "play" && player && !waitRelease) player.exhaleStart();
@@ -590,7 +592,14 @@ function connect() {
       if (m.event === "exhale_start") onExhaleStart();
       if (m.event === "exhale_end" || m.event === "baseline_reset") onExhaleEnd(m);
     } else if (m.type === "touch" && m.source === "board") setHoles(m.holes);
-    else if (m.type === "session_result") showResult(m);
+    else if (m.type === "session_result") { if (player || WATCH) showResult(m); } // 演奏していた画面だけ
+    else if (m.type === "session_owner" && !WATCH && player) {
+      // 別の画面で演奏が始まった：こちらの演奏は止めてホームへ
+      player.stop();
+      stopTrace();
+      player = null;
+      show("home");
+    }
     else if (m.type === "history") renderHistory(m);
     else if (m.type === "profile") { me = m; renderMe(); }
     else if (m.type === "records") renderShelf(m.records);
