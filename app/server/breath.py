@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 # H12（コンビニ袋で密閉）の実測：静止ぶれ 0.4Pa、弱く +122Pa、強く +312Pa、吸う -30Pa
 # 1回目の試奏で、袋に触れた時などの小さな気圧変化を息と誤検知したため、しきい値を高めにしている
-EXHALE_ON = 30.0
+EXHALE_ON = 20.0  # 10/18 試奏2回目：弱めの息（+20Pa 前後）も拾う。硬いボトルなので触った時の誤検知は袋より少ない
 # 10/18 の試奏：吐き始め 35〜50Pa → ゆっくり弱まり 10〜20Pa で吐き続けていたのに、15Pa で「吐き終わり」になっていた
 EXHALE_OFF = 6.0
 END_SAMPLES = 2  # 吐き終わりは、しきい値を2回続けて下回ったら（1回だけの落ち込みでは終わりにしない）
@@ -20,6 +20,11 @@ BASELINE_FOLLOW_BAND = 10.0  # 基準値から ±この範囲の時だけ追従�
 # この秒数以上、変化がほぼ一定のまま吐く/吸う状態が続いたら基準値を測り直す
 STUCK_SEC = 12.0
 STUCK_SPREAD = 6.0
+# 10/18 の試奏2回目：吐いた後、ボトルの中が冷えて気圧が 15〜25Pa 低いまま数十秒戻らず、次の息が届かなくなった。
+# 吐いていない時に、値が基準からずれたまま止まっていたら（約3秒）、そこを新しい基準にする
+SETTLE_SAMPLES = 9
+SETTLE_SPREAD = 4.0
+SETTLE_MIN_OFFSET = 8.0
 
 
 @dataclass
@@ -61,6 +66,7 @@ class BreathDetector:
         self.state = "idle"
         self.current: Breath | None = None
         self._low = 0
+        self._recent: list[float] = []
 
     def update(self, t: float, pa: float) -> tuple[dict | None, list[dict]]:
         """新しい気圧の値を入れる。(breath メッセージ, breath_event のリスト) を返す。
@@ -75,6 +81,16 @@ class BreathDetector:
 
         delta = pa - self.baseline
         events: list[dict] = []
+
+        # 吐いていない時に、基準からずれたまま止まっていたら、すぐ基準を合わせ直す
+        self._recent = (self._recent + [pa])[-SETTLE_SAMPLES:]
+        if self.state != "exhale" and len(self._recent) == SETTLE_SAMPLES:
+            spread = max(self._recent) - min(self._recent)
+            if spread < SETTLE_SPREAD and abs(delta) >= SETTLE_MIN_OFFSET:
+                if self.state == "inhale":
+                    events.append(self._end(t))
+                self.baseline = statistics.fmean(self._recent)
+                delta = pa - self.baseline
 
         if self.state == "idle":
             if delta >= EXHALE_ON:
@@ -119,6 +135,7 @@ class BreathDetector:
         """基準値を測り直す（次の数サンプルで決め直す）。"""
         self.baseline = None
         self._warmup = []
+        self._recent = []
         self.state = "idle"
         self.current = None
 

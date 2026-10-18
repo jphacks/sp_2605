@@ -55,6 +55,14 @@ export class Voice {
     this.oscs.forEach((o) => o.start(t));
   }
 
+  // sec 秒かけて、だんだん小さくする（音は止めない）
+  fade(sec) {
+    const t = ctx.currentTime;
+    this.out.gain.cancelScheduledValues(t);
+    this.out.gain.setValueAtTime(this.out.gain.value, t);
+    this.out.gain.linearRampToValueAtTime(0.08, t + sec);
+  }
+
   release(sec = 0.12) {
     const t = ctx.currentTime;
     this.out.gain.cancelScheduledValues(t);

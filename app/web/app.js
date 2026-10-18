@@ -11,7 +11,7 @@ import { setStream, confetti } from "./fx.js";
 const $ = (id) => document.getElementById(id);
 // 観戦モード（?watch=1）：別のPCの演奏をそのまま映す。操作できず、記録も保存しない
 const WATCH = new URLSearchParams(location.search).has("watch");
-const MAX_HOLD_SEC = 6; // フレーズの最後の音を伸ばせる上限
+const MAX_HOLD_SEC = 2.5; // フレーズの最後の音を伸ばせる上限（長いと「一定の音が続くだけ」に聞こえる）
 
 // ---------- 画面 ----------
 function show(id) {
@@ -186,6 +186,7 @@ class Player {
         // 吐き続けている限り最後の音を伸ばす（上限あり）
         this.state = "holding";
         prompt("のばして〜", "exhale");
+        this.voice?.fade(MAX_HOLD_SEC); // 伸ばしている間に、だんだん小さくして自然に終わる
         this.timer = setTimeout(() => { this.stopNote(); this.judge(false); this.nextPhrase(); }, MAX_HOLD_SEC * 1000);
       } else {
         this.stopNote(0.04);
