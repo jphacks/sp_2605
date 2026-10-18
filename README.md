@@ -97,7 +97,9 @@ PC のブラウザに表示されるゲームでは、**1フレーズ ＝ 1回�
 すべて Hack Day（10/17〜18）の期間中に開発しました。経過はコミット履歴で確認できます。
 
 * **息の判定**（基準の追従・2段階のしきい値・自動の測り直し）：[app/server/breath.py](app/server/breath.py)（8322052、99c02b0）
-* **4つの指穴のタッチ用ファームウェア**（外付け電極4つを CAPSENSE で読み取り、USB シリアルで送信）：[firmware/touch_psoc4/main.c](firmware/touch_psoc4/main.c)（3a1ab70、c84eb50）
+* **4つの指穴のタッチ用ファームウェア**：[firmware/touch_psoc4/main.c](firmware/touch_psoc4/main.c)（3a1ab70、b4b725a、69b4de0、c84eb50）
+  - Infineon の公式サンプル（[mtb-example-psoc4-msclp-csd-csx-isx-buttons](https://github.com/Infineon/mtb-example-psoc4-msclp-csd-csx-isx-buttons)）を土台にしています。`firmware/touch_psoc4/README.md` はサンプルの説明のままです
+  - **会期中に作った部分**：基板上のボタンの代わりに、外付けの電極4つ（P2.3 / P2.0 / P2.1 / P2.2）を読む CAPSENSE の設定／4つの指穴の状態を「T:0101」の形で USB シリアルに送る処理（`report_touch`）と、そのための UART の設定／状態が変わらなくても約0.2秒ごとに送り直す処理（PC 側がつなぎ直しても状態が分かるように）
 * **1フレーズ ＝ 1回の吐く息で進む演奏と、フレーズごとの判定**：[app/web/app.js](app/web/app.js)、[app/web/game.js](app/web/game.js)（0c47f9e、9e2863a）
 * **呼吸データから経験値・レベル・オーラ**：[app/server/growth.py](app/server/growth.py)、[app/web/avatar.js](app/web/avatar.js)（e4c76e5、3bd0653）
 * **息のレコード**（1本の輪 ＝ 1回の息、レコード棚と演奏の再生）：[app/web/record.js](app/web/record.js)（6a00f1b）
