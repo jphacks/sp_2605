@@ -25,6 +25,9 @@ STUCK_SPREAD = 6.0
 SETTLE_SAMPLES = 9
 SETTLE_SPREAD = 4.0
 SETTLE_MIN_OFFSET = 8.0
+# 10/18 の試奏4回目：吹き終わった後、+9〜10Pa のまま止まり、20秒「吐きっぱなし」になって曲が止まった。
+# 本物の息は細かく揺れるので、弱い値のままほぼ動かない（約3秒）のは息ではなく残った圧とみなし、吐き終わりにする
+EXHALE_STILL_SPREAD = 3.0
 
 
 @dataclass
@@ -84,13 +87,18 @@ class BreathDetector:
 
         # 吐いていない時に、基準からずれたまま止まっていたら、すぐ基準を合わせ直す
         self._recent = (self._recent + [pa])[-SETTLE_SAMPLES:]
-        if self.state != "exhale" and len(self._recent) == SETTLE_SAMPLES:
+        if len(self._recent) == SETTLE_SAMPLES:
             spread = max(self._recent) - min(self._recent)
-            if spread < SETTLE_SPREAD and abs(delta) >= SETTLE_MIN_OFFSET:
+            if self.state != "exhale" and spread < SETTLE_SPREAD and abs(delta) >= SETTLE_MIN_OFFSET:
                 if self.state == "inhale":
                     events.append(self._end(t))
                 self.baseline = statistics.fmean(self._recent)
                 delta = pa - self.baseline
+            elif self.state == "exhale" and spread < EXHALE_STILL_SPREAD and delta < EXHALE_ON:
+                events.append(self._end(t))
+                self.baseline = statistics.fmean(self._recent)
+                delta = pa - self.baseline
+                self._recent = []
 
         if self.state == "idle":
             if delta >= EXHALE_ON:
