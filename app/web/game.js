@@ -43,10 +43,10 @@ export function judgePhrase(diff, { stability, cut, hitRatio }, phraseCount) {
   else if (stability >= diff.good) tier = "GOOD";
   else tier = "MISS";
 
-  // 指穴：正しい穴を押せた割合で、判定の上限を決める（息だけでは PERFECT にならない）
-  //  7割以上 → PERFECT まで ／ 3割以上 → GREAT まで ／ 3割未満 → GOOD まで
+  // 指穴：正しい穴を押せた割合で、判定の上限を決める（息だけでは PERFECT にならない。oira0822 の提案）
+  //  全部 → PERFECT まで ／ 7割以上 → GREAT まで ／ 3割以上 → GOOD まで ／ 3割未満 → MISS（beginner は GOOD）
   const ORDER = ["MISS", "GOOD", "GREAT", "PERFECT"];
-  const cap = hitRatio >= 0.7 ? "PERFECT" : hitRatio >= 0.3 ? "GREAT" : "GOOD";
+  const cap = hitRatio >= 0.999 ? "PERFECT" : hitRatio >= 0.7 ? "GREAT" : hitRatio >= 0.3 || !diff.missOnCut ? "GOOD" : "MISS";
   const capped = tier !== "MISS" && ORDER.indexOf(tier) > ORDER.indexOf(cap);
   if (capped) tier = cap;
 

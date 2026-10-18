@@ -51,10 +51,7 @@ function tip(g) {
   if (g.stab !== "good") {
     return "息の強さが少しぶれていました。<b>ストローを軽くくわえて、一定の強さで</b>吐くと、音もきれいに伸びます。";
   }
-  if (g.pace === "try" || g.pace === "ok") {
-    return "少し呼吸が速めでした。フレーズの間の<b>吸う時間を、ゆっくりとって</b>みましょう。";
-  }
-  return "とても落ち着いた呼吸でした。<b>このペースを覚えておく</b>と、作業の合間にも思い出せます。";
+  return "とても落ち着いた呼吸でした。<b>この吐き方を覚えておく</b>と、作業の合間にも思い出せます。";
 }
 
 function badges(r) {
@@ -150,7 +147,6 @@ export async function showReview(r, trace) {
   judges.append(
     judgeCard("吐く長さ（平均）", r.exhale_avg_sec.toFixed(1), "秒", g.len, `目安 ${CRITERIA.exhaleSec.good}秒以上`),
     judgeCard("息の安定度", Math.round(r.stability_avg * 100), "%", g.stab, `目安 ${Math.round(CRITERIA.stability.good * 100)}%以上`),
-    judgeCard("呼吸のペース", pace.toFixed(1), "回/分", g.pace, "目安 1分に6回前後"),
   );
   $("tip").innerHTML = tip(g);
   $("badges").innerHTML = "";
