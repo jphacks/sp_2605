@@ -212,6 +212,7 @@ class Player {
     this.total += 1;
     this.phraseTotal += 1;
     if (this.currentHit) { this.hits += 1; this.phraseHits += 1; } else this.holeStreak = 0;
+    this.noteHit[this.note] = !!this.currentHit;
   }
 
   // 指穴がタイミングよく合った：穴と目印から、穴の色の光をはじけさせる
@@ -250,6 +251,7 @@ class Player {
   }
 
   renderPhrase() {
+    this.noteHit = []; // このフレーズの音ごとに、指穴が合ったか
     $("phraseDots").innerHTML = this.song.phrases
       .map((_, i) => `<i class="${i < this.phrase ? "done" : i === this.phrase ? "now" : ""}"></i>`)
       .join("");
@@ -261,7 +263,9 @@ class Player {
   renderNote(beforeStart = false) {
     [...$("noteRow").children].forEach((el, i) => {
       el.classList.toggle("played", i < this.note);
+      el.classList.toggle("ok", i < this.note && !!this.noteHit[i]);
       el.classList.toggle("now", i === this.note && !beforeStart);
+      el.classList.toggle("first", i === this.note && beforeStart); // 吐く前：最初に押す穴を先に見せる
     });
     const hole = holeFor(this.notes[this.note][0]);
     document.querySelectorAll("#holes span").forEach((el, i) => {
