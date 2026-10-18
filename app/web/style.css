@@ -625,7 +625,7 @@ body.watch .devbar { display: none; }
 
 /* リズムの目印：変化をはっきり（投影しても分かるように）
    今の音＝大きく白枠で弾む／終わった音＝合った穴は穴の色で塗りつぶして ✓、合わなかった音は灰色／吐く前＝最初の丸が点滅 */
-.msg-win .note-row { gap: 14px; padding: 8px 6px 4px; }
+.msg-win .note-row { gap: 14px; padding: 8px 6px 22px; }
 .msg-win .note-row i { width: 42px; height: 42px; font-size: 20px; position: relative; background: #1b2347; border-width: 3px; }
 .msg-win .note-row i.now {
   background: var(--hc); color: #0d1430; border-color: #fff; opacity: 1;
@@ -643,3 +643,22 @@ body.watch .devbar { display: none; }
 .msg-win .note-row i.first { border-color: #fff; animation: noteFirst 0.6s ease-in-out infinite alternate; }
 @keyframes noteFirst { from { box-shadow: 0 0 0 0 var(--hc); transform: scale(1); } to { box-shadow: 0 0 0 7px transparent, 0 0 20px var(--hc); transform: scale(1.25); } }
 @media (prefers-reduced-motion: reduce) { .msg-win .note-row i.now, .msg-win .note-row i.first { animation: none; } }
+
+/* 今の音：押す前は「押して！」、正しい穴を押せたら金色の枠で大きく ✓（押せていることが一目で分かるように） */
+.msg-win .note-row i.now:not(.nowhit)::before {
+  content: "押して！"; position: absolute; left: 50%; top: 46px; transform: translateX(-50%) scale(0.62);
+  white-space: nowrap; font-size: 14px; padding: 2px 8px; border-radius: 8px;
+  background: #fff; color: #0d1430; font-weight: bold;
+}
+.msg-win .note-row i.now.nowhit {
+  border-color: #ffd166; border-width: 4px;
+  box-shadow: 0 0 0 6px rgba(255, 209, 102, 0.55), 0 0 34px 10px var(--hc), 0 0 60px 6px #ffd166;
+  animation: noteHitPop 0.35s ease-out, noteNowHit 0.4s 0.35s ease-in-out infinite alternate;
+}
+.msg-win .note-row i.now.nowhit::after {
+  content: "✓"; position: absolute; right: -12px; top: -14px; font-size: 18px; line-height: 1;
+  color: #0d1430; background: #ffd166; border-radius: 50%; padding: 3px 5px; box-shadow: 0 0 10px #ffd166;
+}
+@keyframes noteHitPop { 0% { transform: scale(1.5); } 50% { transform: scale(2.2) rotate(-8deg); } 100% { transform: scale(1.8); } }
+@keyframes noteNowHit { from { transform: scale(1.75); } to { transform: scale(1.9) translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .msg-win .note-row i.now.nowhit { animation: none; transform: scale(1.8); } }

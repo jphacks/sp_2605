@@ -1,5 +1,5 @@
-import { SONGS, noteToFreq, holeFor } from "./songs.js";
-import { ensureAudio, setBreathLevel, Voice, sparkle, levelUpSfx } from "./audio.js";
+import { SONGS, noteToFreq, holeFor, chordFor, bassFreq } from "./songs.js";
+import { ensureAudio, setBreathLevel, Voice, Bass, sparkle, levelUpSfx } from "./audio.js";
 import { burst } from "./fx.js";
 import { barChart, lineChart } from "./charts.js";
 import { showReview } from "./review.js";
@@ -180,6 +180,9 @@ class Player {
     // hard 以上は正しい穴を押していないと鳴らない
     this.voice = !this.diff.needHole || clean ? new Voice(noteToFreq(name), clean) : null;
     this.currentHit = clean;
+    // ベースライン（伴奏）：メロディに合う和音の低い音を、根音・5度と交互に
+    this.chord = chordFor(name, this.note === 0 ? null : this.chord);
+    this.bass = new Bass(bassFreq(this.chord, this.note));
     this.renderNote();
     if (clean) this.holeHit(hole);
 
@@ -191,6 +194,7 @@ class Player {
         this.state = "holding";
         prompt("のばして〜", "exhale");
         this.voice?.fade(MAX_HOLD_SEC); // 伸ばしている間に、だんだん小さくして自然に終わる
+        this.bass?.fade(MAX_HOLD_SEC);
         this.timer = setTimeout(() => { this.stopNote(); this.judge(false); this.nextPhrase(); }, MAX_HOLD_SEC * 1000);
       } else {
         this.stopNote(0.04);
@@ -232,13 +236,18 @@ class Player {
       ring(holeEl, color);
       popText(holeEl, n >= 2 ? `ナイス！ ×${n}` : "ナイス！", color, n);
     }
-    if (noteEl) burst(noteEl, { colors: [color, "#ffffff"], count: 22, speed: 360, size: 5, stars: true, gravity: 200 });
+    if (noteEl) {
+      burst(noteEl, { colors: [color, "#ffd166", "#ffffff"], count: 50, speed: 460, size: 6, stars: true, gravity: 220 });
+      ring(noteEl, "#ffd166");
+    }
   }
 
   stopNote(release) {
     clearTimeout(this.timer);
     this.voice?.release(release);
     this.voice = null;
+    this.bass?.release();
+    this.bass = null;
   }
 
   nextPhrase() {
@@ -269,6 +278,7 @@ class Player {
       el.classList.toggle("played", i < this.note);
       el.classList.toggle("ok", i < this.note && !!this.noteHit[i]);
       el.classList.toggle("now", i === this.note && !beforeStart);
+      el.classList.toggle("nowhit", i === this.note && !beforeStart && !!this.currentHit);
       el.classList.toggle("first", i === this.note && beforeStart); // 吐く前：最初に押す穴を先に見せる
     });
     const hole = holeFor(this.notes[this.note][0]);

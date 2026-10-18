@@ -138,3 +138,42 @@ export function sparkle(streak = 1) {
     o.stop(s + 0.4);
   });
 }
+
+// ベース（伴奏）：低い三角波。はじいた後、少し小さくなって続く。音量は息の強さ（master）に連動する
+export class Bass {
+  constructor(freq) {
+    const t = ctx.currentTime;
+    this.out = ctx.createGain();
+    this.out.gain.setValueAtTime(0, t);
+    this.out.gain.linearRampToValueAtTime(0.42, t + 0.012);
+    this.out.gain.exponentialRampToValueAtTime(0.2, t + 0.35);
+    this.out.connect(master);
+    const o = ctx.createOscillator();
+    o.type = "triangle";
+    o.frequency.value = freq;
+    const sub = ctx.createOscillator(); // 1オクターブ下を少しだけ混ぜて太くする
+    sub.type = "sine";
+    sub.frequency.value = freq / 2;
+    const subGain = ctx.createGain();
+    subGain.gain.value = 0.5;
+    o.connect(this.out);
+    sub.connect(subGain).connect(this.out);
+    this.oscs = [o, sub];
+    this.oscs.forEach((x) => x.start(t));
+  }
+
+  fade(sec) {
+    const t = ctx.currentTime;
+    this.out.gain.cancelScheduledValues(t);
+    this.out.gain.setValueAtTime(this.out.gain.value, t);
+    this.out.gain.linearRampToValueAtTime(0.03, t + sec);
+  }
+
+  release(sec = 0.08) {
+    const t = ctx.currentTime;
+    this.out.gain.cancelScheduledValues(t);
+    this.out.gain.setValueAtTime(this.out.gain.value, t);
+    this.out.gain.linearRampToValueAtTime(0, t + sec);
+    this.oscs.forEach((x) => x.stop(t + sec + 0.02));
+  }
+}

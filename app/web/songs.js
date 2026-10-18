@@ -47,3 +47,19 @@ export function holeFor(name) {
   if (octave <= 4) return 0;
   return { C: 0, D: 0, E: 1, F: 1, G: 2, A: 2, B: 3 }[letter];
 }
+
+// ベースライン：メロディの音を含む和音（C・F・G）を選び、根音と5度を交互に弾く。
+// 前の和音にメロディの音が含まれていれば和音を変えない（コロコロ変わらないように）
+const TRIADS = { C: ["C", "E", "G"], F: ["F", "A", "C"], G: ["G", "B", "D"] };
+// [根音, 5度]。ノートPCのスピーカーは 100Hz より低い音がほとんど出ないので、C3〜C4 のあたりにする
+const BASS_HZ = { C: [130.81, 196.0], F: [174.61, 130.81], G: [196.0, 146.83] };
+
+export function chordFor(name, prev) {
+  const letter = name[0];
+  if (prev && TRIADS[prev].includes(letter)) return prev;
+  return ["C", "G", "F"].find((c) => TRIADS[c].includes(letter)) || "C";
+}
+
+export function bassFreq(chord, step) {
+  return BASS_HZ[chord][step % 2];
+}
