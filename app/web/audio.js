@@ -111,19 +111,22 @@ export function levelUpSfx() {
 }
 
 // 正しい穴を押した時のきらっとした効果音
-export function sparkle() {
+// streak：続けて合った回数。多いほど少しずつ高く・きらびやかになる
+export function sparkle(streak = 1) {
   if (!ctx) return;
   const t = ctx.currentTime;
-  [2093, 2637].forEach((f, i) => {
+  const up = 2 ** (Math.min(streak - 1, 7) / 12);
+  [1568, 2093, 2637, 3136].forEach((f, i) => {
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.type = "sine";
-    o.frequency.value = f;
-    g.gain.setValueAtTime(0.0001, t + i * 0.05);
-    g.gain.exponentialRampToValueAtTime(0.08, t + i * 0.05 + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.05 + 0.25);
+    o.type = i === 0 ? "triangle" : "sine";
+    o.frequency.value = f * up;
+    const s = t + i * 0.035;
+    g.gain.setValueAtTime(0.0001, s);
+    g.gain.exponentialRampToValueAtTime(i === 0 ? 0.12 : 0.09, s + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, s + 0.35);
     o.connect(g).connect(ctx.destination);
-    o.start(t + i * 0.05);
-    o.stop(t + i * 0.05 + 0.3);
+    o.start(s);
+    o.stop(s + 0.4);
   });
 }

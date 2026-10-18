@@ -1,5 +1,6 @@
 import { SONGS, noteToFreq, holeFor } from "./songs.js";
 import { ensureAudio, setBreathLevel, Voice, sparkle, levelUpSfx } from "./audio.js";
+import { burst } from "./fx.js";
 import { barChart, lineChart } from "./charts.js";
 import { showReview } from "./review.js";
 import { DIFFICULTIES, DIFFICULTY_ORDER, STAGES, Battle, judgePhrase, summarize } from "./game.js";
@@ -98,6 +99,7 @@ class Player {
     this.total = 0;
     this.results = [];
     this.combo = 0;
+    this.holeStreak = 0; // 指穴が続けて合った回数
     this.resetPhraseStats();
     this.battle = new Battle($("battle"), currentStage(), me);
     this.recent = [];
@@ -174,8 +176,8 @@ class Player {
     // hard 以上は正しい穴を押していないと鳴らない
     this.voice = !this.diff.needHole || clean ? new Voice(noteToFreq(name), clean) : null;
     this.currentHit = clean;
-    if (clean) sparkle();
     this.renderNote();
+    if (clean) this.holeHit(hole);
 
     const last = this.note === this.notes.length - 1;
     this.timer = setTimeout(() => {
@@ -200,15 +202,31 @@ class Player {
     if (holes[holeFor(name)]) {
       this.currentHit = true;
       if (!this.voice) this.voice = new Voice(noteToFreq(name), true);
-      sparkle();
       this.renderNote();
+      this.holeHit(holeFor(name));
     }
   }
 
   countNote() {
     this.total += 1;
     this.phraseTotal += 1;
-    if (this.currentHit) { this.hits += 1; this.phraseHits += 1; }
+    if (this.currentHit) { this.hits += 1; this.phraseHits += 1; } else this.holeStreak = 0;
+  }
+
+  // 指穴がタイミングよく合った：穴と目印から、穴の色の光をはじけさせる
+  holeHit(i) {
+    this.holeStreak += 1;
+    const n = this.holeStreak;
+    const color = HOLE_COLORS[i];
+    sparkle(n);
+    const holeEl = document.querySelectorAll("#holes span")[i];
+    const noteEl = $("noteRow").children[this.note];
+    if (holeEl) {
+      burst(holeEl, { colors: [color, "#ffffff", color, "#fff3b0"], count: Math.min(80, 36 + n * 6), speed: 520 + Math.min(n, 8) * 40, size: 7, stars: true, gravity: 380 });
+      ring(holeEl, color);
+      popText(holeEl, n >= 2 ? `ナイス！ ×${n}` : "ナイス！", color, n);
+    }
+    if (noteEl) burst(noteEl, { colors: [color, "#ffffff"], count: 22, speed: 360, size: 5, stars: true, gravity: 200 });
   }
 
   stopNote(release) {
@@ -254,6 +272,29 @@ class Player {
   summary() { return summarize(this.results, this.battle.defeated); }
 
   stop() { this.stopNote(); this.state = "done"; }
+}
+
+const HOLE_COLORS = ["#ff7a7a", "#ffc857", "#6fdc8c", "#6cb6ff"]; // style.css の --h1〜--h4 と同じ
+
+// 要素から広がる光の輪
+function ring(el, color) {
+  const r = el.getBoundingClientRect();
+  const d = document.createElement("div");
+  d.className = "hit-ring";
+  d.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;--c:${color}`;
+  document.body.append(d);
+  setTimeout(() => d.remove(), 700);
+}
+
+// 要素の上に浮かび上がる文字（続けて合うほど大きく）
+function popText(el, text, color, n) {
+  const r = el.getBoundingClientRect();
+  const d = document.createElement("div");
+  d.className = "hit-pop";
+  d.textContent = text;
+  d.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top}px;--c:${color};--s:${Math.min(1.6, 1 + n * 0.08)}`;
+  document.body.append(d);
+  setTimeout(() => d.remove(), 900);
 }
 
 function prompt(text, cls) {

@@ -7,7 +7,9 @@ from dataclasses import dataclass, field
 # H12（コンビニ袋で密閉）の実測：静止ぶれ 0.4Pa、弱く +122Pa、強く +312Pa、吸う -30Pa
 # 1回目の試奏で、袋に触れた時などの小さな気圧変化を息と誤検知したため、しきい値を高めにしている
 EXHALE_ON = 30.0
-EXHALE_OFF = 15.0
+# 10/18 の試奏：吐き始め 35〜50Pa → ゆっくり弱まり 10〜20Pa で吐き続けていたのに、15Pa で「吐き終わり」になっていた
+EXHALE_OFF = 6.0
+END_SAMPLES = 2  # 吐き終わりは、しきい値を2回続けて下回ったら（1回だけの落ち込みでは終わりにしない）
 INHALE_ON = -25.0
 INHALE_OFF = -10.0
 STRENGTH_FULL = 300.0  # この変化量で strength = 1
@@ -58,6 +60,7 @@ class BreathDetector:
         self._warmup: list[float] = []
         self.state = "idle"
         self.current: Breath | None = None
+        self._low = 0
 
     def update(self, t: float, pa: float) -> tuple[dict | None, list[dict]]:
         """新しい気圧の値を入れる。(breath メッセージ, breath_event のリスト) を返す。
@@ -81,9 +84,14 @@ class BreathDetector:
             elif abs(delta) < BASELINE_FOLLOW_BAND:
                 self.baseline += BASELINE_FOLLOW * delta
         elif self.state == "exhale" and delta < EXHALE_OFF:
-            events.append(self._end(t))
-            if delta <= INHALE_ON:
-                events.append(self._start("inhale", t))
+            self._low += 1
+            # 吸い始めたらすぐ切り替える。それ以外は、少し続けて弱まったら吐き終わり
+            if delta <= INHALE_ON or self._low >= END_SAMPLES:
+                events.append(self._end(t))
+                if delta <= INHALE_ON:
+                    events.append(self._start("inhale", t))
+        elif self.state == "exhale":
+            self._low = 0
         elif self.state == "inhale" and delta > INHALE_OFF:
             events.append(self._end(t))
             if delta >= EXHALE_ON:
@@ -116,6 +124,7 @@ class BreathDetector:
 
     def _start(self, kind: str, t: float) -> dict:
         self.state = kind
+        self._low = 0
         self.current = Breath(kind=kind, start=t)
         return {"type": "breath_event", "event": f"{kind}_start", "t": round(t, 3)}
 
