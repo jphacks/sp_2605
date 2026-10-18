@@ -43,13 +43,20 @@ export function judgePhrase(diff, { stability, cut, hitRatio }, phraseCount) {
   else if (stability >= diff.good) tier = "GOOD";
   else tier = "MISS";
 
+  // 指穴：正しい穴を押せた割合で、判定の上限を決める（息だけでは PERFECT にならない）
+  //  7割以上 → PERFECT まで ／ 3割以上 → GREAT まで ／ 3割未満 → GOOD まで
+  const ORDER = ["MISS", "GOOD", "GREAT", "PERFECT"];
+  const cap = hitRatio >= 0.7 ? "PERFECT" : hitRatio >= 0.3 ? "GREAT" : "GOOD";
+  const capped = tier !== "MISS" && ORDER.indexOf(tier) > ORDER.indexOf(cap);
+  if (capped) tier = cap;
+
   let damage = GAME.damage[tier];
   if (tier !== "MISS") {
     if (diff.holeBonus && hitRatio >= 0.5) damage += diff.holeBonus;
     if (diff.needHole) damage *= 0.5 + 0.5 * hitRatio; // 鳴らなかった音のぶん弱くなる
   }
   damage = Math.round(damage * GAME.basePhrases / phraseCount);
-  return { tier, damage, points: GAME.points[tier] };
+  return { tier, damage, points: GAME.points[tier], capped };
 }
 
 // 戦闘の表示（ド派手版）

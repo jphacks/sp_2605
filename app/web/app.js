@@ -169,6 +169,8 @@ class Player {
     const hitRatio = this.phraseTotal ? this.phraseHits / this.phraseTotal : 0;
     const r = judgePhrase(this.diff, { stability, cut, hitRatio }, this.song.phrases.length);
     this.results.push(r);
+    // 指穴が足りずに判定が下がった時は、指穴も押すように知らせる
+    if (r.capped) popText($("holes"), "指穴も押すと PERFECT！", "#ffffff", 1);
     this.combo = r.tier === "MISS" ? 0 : this.combo + 1;
     this.battle.hit(r, this.combo);
     this.resetPhraseStats();
@@ -319,7 +321,7 @@ class Player {
     });
   }
 
-  summary() { return summarize(this.results, this.battle.defeated); }
+  summary() { return { ...summarize(this.results, this.battle.defeated), hits: this.hits, total: this.total }; }
 
   stop() { this.stopNote(); this.state = "done"; }
 }
@@ -451,7 +453,8 @@ function renderGameResult(s) {
   $("score").textContent = s.score;
   $("breakdown").innerHTML = Object.entries(s.count)
     .filter(([tier, n]) => n || tier !== "GREAT")
-    .map(([tier, n]) => `<span class="${tier.toLowerCase()}">${tier} ${n}</span>`).join("");
+    .map(([tier, n]) => `<span class="${tier.toLowerCase()}">${tier} ${n}</span>`).join("")
+    + (s.total ? `<span class="holes-rate">指穴 ${s.hits}/${s.total}</span>` : "");
   $("lowerBtn").hidden = diffKey === DIFFICULTY_ORDER[0];
 }
 
