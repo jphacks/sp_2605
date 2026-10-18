@@ -117,6 +117,7 @@ class Player {
   }
 
   exhaleStart() {
+    if (this.rowTimer) { clearTimeout(this.rowTimer); this.rowTimer = null; this.renderPhrase(); }
     if (this.state === "ready" || this.state === "paused") {
       this.state = "playing";
       prompt(this.battle.defeated ? "フィナーレ ♪" : "ゆっくり吐いて ♪", "exhale");
@@ -195,6 +196,8 @@ class Player {
         // 吐き続けている限り最後の音を伸ばす（上限あり）
         this.state = "holding";
         prompt("のばして〜", "exhale");
+        this.renderNote();
+        $("noteRow").children[this.note]?.classList.add("hold");
         this.voice?.fade(MAX_HOLD_SEC); // 伸ばしている間に、だんだん小さくして自然に終わる
         this.bass?.fade(MAX_HOLD_SEC);
         this.pad?.fade(MAX_HOLD_SEC);
@@ -256,6 +259,7 @@ class Player {
   }
 
   nextPhrase() {
+    this.closeRow();
     this.phrase += 1;
     this.note = 0;
     if (this.phrase >= this.song.phrases.length) {
@@ -265,7 +269,29 @@ class Player {
     }
     this.state = "ready";
     prompt("すって… 吐いたら次のフレーズ", "inhale");
-    this.renderPhrase();
+    clearTimeout(this.rowTimer);
+    this.rowTimer = setTimeout(() => { this.rowTimer = null; this.renderPhrase(); }, 900);
+  }
+
+  // 終わったフレーズの目印：最後の丸まで「終わった」表示にして、光らせる
+  closeRow() {
+    const row = $("noteRow");
+    const kids = [...row.children];
+    kids.forEach((el, i) => {
+      el.classList.remove("now", "nowhit", "hold", "first");
+      el.classList.add("played");
+      el.classList.toggle("ok", !!this.noteHit[i]);
+    });
+    const last = kids[kids.length - 1];
+    const missed = this.results[this.results.length - 1]?.tier === "MISS";
+    if (last && !missed) {
+      burst(last, { colors: ["#ffd166", "#ffffff", "#fff3b0"], count: 60, speed: 520, size: 6, stars: true, gravity: 240 });
+      ring(last, "#ffd166");
+      popText(last, "クリア！", "#ffd166", 4);
+    }
+    row.classList.remove("row-clear", "row-miss");
+    void row.offsetWidth;
+    row.classList.add(missed ? "row-miss" : "row-clear");
   }
 
   renderPhrase() {

@@ -662,3 +662,23 @@ body.watch .devbar { display: none; }
 @keyframes noteHitPop { 0% { transform: scale(1.5); } 50% { transform: scale(2.2) rotate(-8deg); } 100% { transform: scale(1.8); } }
 @keyframes noteNowHit { from { transform: scale(1.75); } to { transform: scale(1.9) translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { .msg-win .note-row i.now.nowhit { animation: none; transform: scale(1.8); } }
+
+/* フレーズの最後の音：のばしている間は「のばして〜」で脈打つ／終わった瞬間は列全体が光る */
+.msg-win .note-row i.now.hold::before {
+  content: "のばして〜"; position: absolute; left: 50%; top: 46px; transform: translateX(-50%) scale(0.62);
+  white-space: nowrap; font-size: 14px; padding: 2px 8px; border-radius: 8px;
+  background: #ffd166; color: #0d1430; font-weight: bold;
+}
+.msg-win .note-row i.now.hold { animation: noteHold 0.7s ease-in-out infinite alternate; }
+@keyframes noteHold {
+  from { transform: scale(1.6); box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.5), 0 0 20px 4px var(--hc); }
+  to { transform: scale(2.0); box-shadow: 0 0 0 12px rgba(255, 209, 102, 0.15), 0 0 40px 12px var(--hc); }
+}
+.msg-win .note-row.row-clear { animation: rowClear 0.9s ease-out; border-radius: 12px; }
+@keyframes rowClear {
+  0% { background: rgba(255, 209, 102, 0.55); box-shadow: 0 0 30px rgba(255, 209, 102, 0.8); }
+  100% { background: transparent; box-shadow: none; }
+}
+.msg-win .note-row.row-miss { animation: rowMiss 0.6s ease-out; border-radius: 12px; }
+@keyframes rowMiss { 0% { background: rgba(232, 106, 90, 0.4); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .msg-win .note-row i.now.hold, .msg-win .note-row.row-clear, .msg-win .note-row.row-miss { animation: none; } }
