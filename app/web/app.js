@@ -1,5 +1,5 @@
-import { SONGS, noteToFreq, holeFor, chordFor, bassFreq } from "./songs.js";
-import { ensureAudio, setBreathLevel, Voice, Bass, sparkle, levelUpSfx } from "./audio.js";
+import { SONGS, noteToFreq, holeFor, chordFor, bassFreq, padFreqs } from "./songs.js";
+import { ensureAudio, setBreathLevel, Voice, Bass, Pad, shaker, sparkle, levelUpSfx } from "./audio.js";
 import { burst } from "./fx.js";
 import { barChart, lineChart } from "./charts.js";
 import { showReview } from "./review.js";
@@ -183,6 +183,8 @@ class Player {
     // ベースライン（伴奏）：メロディに合う和音の低い音を、根音・5度と交互に
     this.chord = chordFor(name, this.note === 0 ? null : this.chord);
     this.bass = new Bass(bassFreq(this.chord, this.note));
+    this.pad = new Pad(padFreqs(this.chord)); // 和音の刻み
+    shaker(this.note % 2 === 0); // 軽いリズム
     this.renderNote();
     if (clean) this.holeHit(hole);
 
@@ -195,6 +197,7 @@ class Player {
         prompt("のばして〜", "exhale");
         this.voice?.fade(MAX_HOLD_SEC); // 伸ばしている間に、だんだん小さくして自然に終わる
         this.bass?.fade(MAX_HOLD_SEC);
+        this.pad?.fade(MAX_HOLD_SEC);
         this.timer = setTimeout(() => { this.stopNote(); this.judge(false); this.nextPhrase(); }, MAX_HOLD_SEC * 1000);
       } else {
         this.stopNote(0.04);
@@ -248,6 +251,8 @@ class Player {
     this.voice = null;
     this.bass?.release();
     this.bass = null;
+    this.pad?.release();
+    this.pad = null;
   }
 
   nextPhrase() {

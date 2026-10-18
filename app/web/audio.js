@@ -145,8 +145,8 @@ export class Bass {
     const t = ctx.currentTime;
     this.out = ctx.createGain();
     this.out.gain.setValueAtTime(0, t);
-    this.out.gain.linearRampToValueAtTime(0.42, t + 0.012);
-    this.out.gain.exponentialRampToValueAtTime(0.2, t + 0.35);
+    this.out.gain.linearRampToValueAtTime(0.55, t + 0.012);
+    this.out.gain.exponentialRampToValueAtTime(0.32, t + 0.35);
     this.out.connect(master);
     const o = ctx.createOscillator();
     o.type = "triangle";
@@ -176,4 +176,67 @@ export class Bass {
     this.out.gain.linearRampToValueAtTime(0, t + sec);
     this.oscs.forEach((x) => x.stop(t + sec + 0.02));
   }
+}
+
+// 和音の刻み（コード）：3つの音をやわらかく「ジャン」と鳴らす。音ごとに鳴らし直してギターの刻みのようにする
+export class Pad {
+  constructor(freqs) {
+    const t = ctx.currentTime;
+    this.out = ctx.createGain();
+    this.out.gain.setValueAtTime(0, t);
+    this.out.gain.linearRampToValueAtTime(0.16, t + 0.03);
+    this.out.gain.exponentialRampToValueAtTime(0.08, t + 0.5);
+    const tone = ctx.createBiquadFilter(); // 高い成分を少し落として、メロディの邪魔をしない
+    tone.type = "lowpass";
+    tone.frequency.value = 1800;
+    tone.connect(this.out);
+    this.out.connect(master);
+    this.oscs = freqs.map((f, i) => {
+      const o = ctx.createOscillator();
+      o.type = "triangle";
+      o.frequency.value = f;
+      o.detune.value = (i - 1) * 4; // ほんの少しずらして広がりを出す
+      o.connect(tone);
+      return o;
+    });
+    this.oscs.forEach((o) => o.start(t));
+  }
+
+  fade(sec) {
+    const t = ctx.currentTime;
+    this.out.gain.cancelScheduledValues(t);
+    this.out.gain.setValueAtTime(this.out.gain.value, t);
+    this.out.gain.linearRampToValueAtTime(0.01, t + sec);
+  }
+
+  release(sec = 0.12) {
+    const t = ctx.currentTime;
+    this.out.gain.cancelScheduledValues(t);
+    this.out.gain.setValueAtTime(this.out.gain.value, t);
+    this.out.gain.linearRampToValueAtTime(0, t + sec);
+    this.oscs.forEach((o) => o.stop(t + sec + 0.02));
+  }
+}
+
+// 軽いリズム（シェイカー）：短いノイズ。strong=true（小節の頭）は少し大きく
+let noiseBuf = null;
+export function shaker(strong = false) {
+  if (!ctx) return;
+  if (!noiseBuf) {
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.12, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  const t = ctx.currentTime;
+  const src = ctx.createBufferSource();
+  src.buffer = noiseBuf;
+  const hp = ctx.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.value = 6000;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(strong ? 0.22 : 0.12, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+  src.connect(hp).connect(g).connect(master);
+  src.start(t);
+  src.stop(t + 0.12);
 }

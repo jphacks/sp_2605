@@ -63,3 +63,9 @@ export function chordFor(name, prev) {
 export function bassFreq(chord, step) {
   return BASS_HZ[chord][step % 2];
 }
+
+// 和音の刻みに使う3つの音（メロディより低い C3〜D4 のあたり）
+const PAD_HZ = { C: [261.63, 329.63, 392.0], F: [174.61, 220.0, 261.63], G: [196.0, 246.94, 293.66] };
+export function padFreqs(chord) {
+  return PAD_HZ[chord];
+}
